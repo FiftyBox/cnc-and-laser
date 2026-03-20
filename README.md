@@ -1,21 +1,27 @@
 # Box50 — Open Standard for Modular CNC/Laser-Cut Boxes
 
-**Box50** is an open, modular standard for CNC/laser‑cut boxes made from **3 mm MDF/Plywood**,  
-designed for storing board‑game components, hobby items, and any small items requiring structured containerization.
+Box50 is an open, modular standard for CNC/laser‑cut boxes made from 3mm MDF/Plywood, designed for storing board‑game components, hobby items, and any other small objects.
 
-Box50 provides:
+The system is:
+- Modular (external dimensions are 50 mm multiples)
+- Maker-friendly (laser/CNC compatible)
+- Flexible (Type A: universal boxes)
+- Optimized (Type B: game-specific boxes)
+- Secure (sliding-lid system)
 
-- 📦 **Normalized external dimensions** (multiples of 50 mm)
-- 🎚️ Two box families:
-  - **Type A — Universal** (adjustable compartments, mortises + removable dividers)
-  - **Type B — Specific** (game‑optimized, no unused mortises)
-- 🛡️ A robust **sliding‑lid system** (dual‑side rails)
-- 🧩 Optional internal dividers (fixed or removable)
-- 🪚 Full compatibility with CNC routers and laser cutters
-- 🔁 Can be used **flat, stacked, or vertically**
+See the docs/ directory for full details.
 
-This repository defines the Box50 technical standard, reference documentation, module library, and guidelines for extensions.
+## Features
+- 50 mm grid external sizes (width, depth, height)
+- Rectangular finger-joint assembly
+- Sliding-lid system with dual rails
+- Universal (Type A) or specific (Type B) designs
+- Modular inserts (cards, tokens, dice…)
+- Fully documented formulas
+- Generator-ready architecture
 
-See `/docs/` for the full technical specification.
+## License
+MIT License. See LICENSE.
 
-License: **MIT**
+## Version
+Box50 Standard v1.0
