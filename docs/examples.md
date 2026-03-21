@@ -29,13 +29,15 @@ First joint convention for this validation case:
 - front, back, left, right: bottom mortise edge
 - bottom panel: tenon edges on all four sides
 - joint pitch: 12.5 mm
-- top wall edges remain straight in this phase
+- top wall edges remain straight by design to preserve the lid opening
 
 First rail convention for this validation case:
-- left and right panels contain one rectangular rail slot each
-- slot top offset: 3 mm
-- slot height: 3.2 mm
-- slot length: panel width minus leading material margin minus 3 mm
+- left and right panels contain one stepped rail slot each
+- groove top offset: 3 mm
+- running groove height: 3.2 mm
+- running groove length: panel width minus leading material margin minus 3 mm
+- loading pocket length: 6 mm
+- loading pocket extra depth: 3 mm
 
 First Type A mortise-grid convention for this validation case:
 - front and back panels contain rectangular mortise slots

@@ -21,7 +21,8 @@
 - Divider clearance: 0.5 mm
 - Typical use: Cards, markers, larger modular inserts
 - Layout: SVG sheet-layout export generated from the current TypeScript generator
-- Cut: SVG cut-path export generated from the current TypeScript generator
+- Cut: SVG kerf-compensated cut-path export generated from the current TypeScript generator
+
 
 
 

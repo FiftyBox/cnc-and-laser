@@ -50,22 +50,40 @@ export function createTypeABottomPanelGeometry(options: {
   };
 }
 
-export function createTypeARailSlotPath(options: {
+export function createTypeARailProfilePath(options: {
   panelWidth: number;
   materialThickness: number;
   topOffset: number;
-  slotHeight: number;
+  grooveHeight: number;
+  loadingPocketWidth: number;
+  loadingPocketExtraDepth: number;
   trailingMargin: number;
 }): ClosedPath {
-  const slotX = options.materialThickness;
-  const slotY = options.topOffset;
-  const slotWidth = options.panelWidth - options.materialThickness - options.trailingMargin;
+  const startX = options.materialThickness;
+  const topY = options.topOffset;
+  const endX = options.panelWidth - options.trailingMargin;
+  const pocketEndX = startX + options.loadingPocketWidth;
+  const grooveBottomY = topY + options.grooveHeight;
+  const pocketBottomY = grooveBottomY + options.loadingPocketExtraDepth;
 
-  if (slotWidth <= 0) {
-    throw new Error("Rail slot width must be positive.");
+  if (endX <= startX) {
+    throw new Error("Rail profile width must be positive.");
   }
 
-  return createOffsetRectanglePath(slotX, slotY, slotWidth, options.slotHeight);
+  if (pocketEndX >= endX) {
+    throw new Error("Rail loading pocket must fit within the side panel width.");
+  }
+
+  return {
+    points: [
+      { x: startX, y: topY },
+      { x: endX, y: topY },
+      { x: endX, y: grooveBottomY },
+      { x: pocketEndX, y: grooveBottomY },
+      { x: pocketEndX, y: pocketBottomY },
+      { x: startX, y: pocketBottomY },
+    ],
+  };
 }
 
 export function createTypeADividerMortisePaths(options: {
@@ -170,6 +188,68 @@ export function translateClosedPath(path: ClosedPath, offset: Point): ClosedPath
   };
 }
 
+export function compensatePanelKerf(panel: PanelGeometry, kerf: number): PanelGeometry {
+  if (kerf <= 0) {
+    return {
+      ...panel,
+      cutPaths: panel.cutPaths.map((path) => ({
+        points: path.points.map((point) => ({ ...point })),
+      })),
+    };
+  }
+
+  const halfKerf = kerf / 2;
+
+  return {
+    ...panel,
+    cutPaths: panel.cutPaths.map((path, index) => offsetOrthogonalClosedPath(path, index === 0 ? halfKerf : -halfKerf)),
+  };
+}
+
+export function offsetOrthogonalClosedPath(path: ClosedPath, distance: number): ClosedPath {
+  if (distance === 0) {
+    return {
+      points: path.points.map((point) => ({ ...point })),
+    };
+  }
+
+  const points = normalizeClosedPathPoints(path.points);
+
+  if (points.length < 4) {
+    throw new Error("Kerf compensation requires a closed path with at least 4 points.");
+  }
+
+  const orientation = signedArea(points);
+
+  if (orientation === 0) {
+    throw new Error("Kerf compensation requires a non-degenerate closed path.");
+  }
+
+  const edges = points.map((point, index) => {
+    const next = points[(index + 1) % points.length];
+
+    if (next === undefined) {
+      throw new Error("Closed path must contain a next point.");
+    }
+
+    return createOffsetEdge(point, next, orientation, distance);
+  });
+
+  const compensatedPoints = edges.map((edge, index) => {
+    const previous = edges[(index - 1 + edges.length) % edges.length];
+
+    if (previous === undefined) {
+      throw new Error("Closed path must contain a previous edge.");
+    }
+
+    return intersectOffsetEdges(previous, edge);
+  });
+
+  return {
+    points: dedupeSequentialPoints(compensatedPoints),
+  };
+}
+
 export function toSvgPathData(path: ClosedPath): string {
   const [firstPoint, ...otherPoints] = path.points;
 
@@ -189,6 +269,64 @@ export function toSvgPathData(path: ClosedPath): string {
 
 function formatNumber(value: number): string {
   return Number(value.toFixed(3)).toString();
+}
+
+function signedArea(points: Point[]): number {
+  let area = 0;
+
+  for (let index = 0; index < points.length; index += 1) {
+    const current = points[index];
+    const next = points[(index + 1) % points.length];
+
+    if (current === undefined || next === undefined) {
+      continue;
+    }
+
+    area += (current.x * next.y) - (current.y * next.x);
+  }
+
+  return area / 2;
+}
+
+function createOffsetEdge(start: Point, end: Point, orientation: number, distance: number): OffsetEdge {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+
+  if ((dx === 0 && dy === 0) || (dx !== 0 && dy !== 0)) {
+    throw new Error("Kerf compensation currently supports only non-zero orthogonal segments.");
+  }
+
+  const length = Math.hypot(dx, dy);
+  const rightNormal = { x: dy / length, y: -dx / length };
+  const outwardNormal = orientation > 0
+    ? rightNormal
+    : { x: -rightNormal.x, y: -rightNormal.y };
+  const offset = {
+    x: outwardNormal.x * distance,
+    y: outwardNormal.y * distance,
+  };
+  const offsetStart = {
+    x: start.x + offset.x,
+    y: start.y + offset.y,
+  };
+  const offsetEnd = {
+    x: end.x + offset.x,
+    y: end.y + offset.y,
+  };
+
+  return dx === 0
+    ? { axis: "vertical", value: offsetStart.x, start: offsetStart, end: offsetEnd }
+    : { axis: "horizontal", value: offsetStart.y, start: offsetStart, end: offsetEnd };
+}
+
+function intersectOffsetEdges(left: OffsetEdge, right: OffsetEdge): Point {
+  if (left.axis === right.axis) {
+    throw new Error("Kerf compensation requires orthogonal corner transitions.");
+  }
+
+  return left.axis === "vertical"
+    ? { x: left.value, y: right.value }
+    : { x: right.value, y: left.value };
 }
 
 function createJointedRectanglePath(options: {
@@ -343,6 +481,48 @@ function dedupeSequentialPoints(points: Point[]): Point[] {
   });
 }
 
+function normalizeClosedPathPoints(points: Point[]): Point[] {
+  const deduped = dedupeSequentialPoints(points);
+
+  if (deduped.length < 3) {
+    return deduped;
+  }
+
+  let normalized = deduped;
+  let changed = true;
+
+  while (changed && normalized.length >= 3) {
+    changed = false;
+    const next: Point[] = [];
+
+    for (let index = 0; index < normalized.length; index += 1) {
+      const previous = normalized[(index - 1 + normalized.length) % normalized.length];
+      const current = normalized[index];
+      const following = normalized[(index + 1) % normalized.length];
+
+      if (previous === undefined || current === undefined || following === undefined) {
+        continue;
+      }
+
+      if (isCollinearOrthogonal(previous, current, following)) {
+        changed = true;
+        continue;
+      }
+
+      next.push(current);
+    }
+
+    normalized = next;
+  }
+
+  return normalized;
+}
+
+function isCollinearOrthogonal(previous: Point, current: Point, following: Point): boolean {
+  return (previous.x === current.x && current.x === following.x)
+    || (previous.y === current.y && current.y === following.y);
+}
+
 function resolveActiveY(side: "top" | "bottom", style: Exclude<EdgeJointStyle, "straight">, restY: number, materialThickness: number): number {
   if (style === "tenon") {
     return side === "top"
@@ -359,4 +539,11 @@ function advanceX(startX: number, offset: number, direction: "ltr" | "rtl"): num
   return direction === "ltr"
     ? startX + offset
     : startX - offset;
+}
+
+interface OffsetEdge {
+  axis: "horizontal" | "vertical";
+  value: number;
+  start: Point;
+  end: Point;
 }

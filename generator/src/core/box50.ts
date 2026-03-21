@@ -1,4 +1,4 @@
-import { createPanelGeometry, createTypeABottomPanelGeometry, createTypeADividerMortisePaths, createTypeADividerPanelGeometry, createTypeARailSlotPath, createTypeAWallPanelGeometry } from "./geometry.js";
+import { createPanelGeometry, createTypeABottomPanelGeometry, createTypeADividerMortisePaths, createTypeADividerPanelGeometry, createTypeARailProfilePath, createTypeAWallPanelGeometry } from "./geometry.js";
 import type { Box50Config, Box50Dimensions, Box50Project, PanelDefinition, PanelGeometry } from "./types.js";
 import { validateProjectGeometry } from "./validation.js";
 
@@ -82,7 +82,7 @@ export function buildPanels(dimensions: Box50Dimensions, config: Box50Config): P
       width: dimensions.externalDepth,
       height: dimensions.externalHeight,
       quantity: 2,
-      note: "Side walls with future lid-rail geometry",
+      note: "Side walls with stepped lid-rail profile",
     },
     {
       name: "lid",
@@ -154,11 +154,13 @@ export function buildTypeAPanelGeometries(dimensions: Box50Dimensions, config: B
         leftEdge: "tenon",
         rightEdge: "tenon",
         extraCutPaths: [
-          createTypeARailSlotPath({
+          createTypeARailProfilePath({
             panelWidth: dimensions.externalDepth,
             materialThickness: config.materialThickness,
             topOffset: config.materialThickness,
-            slotHeight: 3.2,
+            grooveHeight: 3.2,
+            loadingPocketWidth: 6,
+            loadingPocketExtraDepth: config.materialThickness,
             trailingMargin: config.materialThickness,
           }),
         ],

@@ -41,7 +41,7 @@ Recommended contents:
 Current generated folders contain:
 
 - an SVG layout export with numbered callouts and external legend
-- an SVG cut export with cut paths only
+- an SVG kerf-compensated cut export with cut paths only
 - a README with dimensions and generation assumptions
 
 Each folder should describe the box dimensions, internal dimensions, material assumptions, and any generation parameters.

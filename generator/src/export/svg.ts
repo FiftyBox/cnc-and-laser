@@ -1,4 +1,4 @@
-import { toSvgPathData, translateClosedPath } from "../core/geometry.js";
+import { compensatePanelKerf, toSvgPathData, translateClosedPath } from "../core/geometry.js";
 import { formatMillimeters } from "../core/box50.js";
 import type { Box50Project, PanelGeometry } from "../core/types.js";
 
@@ -81,17 +81,18 @@ function renderLayoutSvg(project: Box50Project): string {
 
 function renderCutSvg(project: Box50Project): string {
   const positionedPanels = layoutPanelGeometries(project.panelGeometries);
-  const contentWidth = positionedPanels.reduce((max, panel) => Math.max(max, panel.x + panel.width), 0);
-  const contentHeight = positionedPanels.reduce((max, panel) => Math.max(max, panel.y + panel.height), 0);
-  const width = contentWidth + PAGE_MARGIN;
-  const height = contentHeight + PAGE_MARGIN;
+  const translatedPaths = positionedPanels.flatMap((panel) => {
+    const compensatedPanel = compensatePanelKerf(panel, project.config.kerf);
 
-  const pathMarkup = positionedPanels.flatMap((panel) => {
-    return panel.cutPaths.map((path) => {
-      const translatedPath = translateClosedPath(path, { x: panel.x, y: panel.y });
-      return `<path d="${toSvgPathData(translatedPath)}" class="cut" />`;
-    });
-  }).join("\n");
+    return compensatedPanel.cutPaths.map((path) => translateClosedPath(path, { x: panel.x, y: panel.y }));
+  });
+  const pathBounds = translatedPaths.flatMap((path) => path.points);
+  const maxX = pathBounds.reduce((max, point) => Math.max(max, point.x), 0);
+  const maxY = pathBounds.reduce((max, point) => Math.max(max, point.y), 0);
+  const width = maxX + PAGE_MARGIN;
+  const height = maxY + PAGE_MARGIN;
+
+  const pathMarkup = translatedPaths.map((path) => `<path d="${toSvgPathData(path)}" class="cut" />`).join("\n");
 
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
@@ -109,12 +110,12 @@ function renderSummary(project: Box50Project, sheetWidth: number, sheetHeight: n
   const { config, dimensions } = project;
 
   return [
-    `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN}" class="title">Box50 Layout Preview</text>`,
+    `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN}" class="title">Box50 Layout</text>`,
     `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 8}" class="meta">Type ${config.type} • Material ${formatMillimeters(config.materialThickness)} • Kerf ${formatMillimeters(config.kerf)}</text>`,
     `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 14}" class="meta">External ${dimensions.externalWidth} × ${dimensions.externalDepth} × ${dimensions.externalHeight} mm</text>`,
     `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 20}" class="meta">Internal ${dimensions.internalWidth.toFixed(2)} × ${dimensions.internalDepth.toFixed(2)} × ${dimensions.internalHeight.toFixed(2)} mm</text>`,
     `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 26}" class="meta">Required sheet envelope ${sheetWidth.toFixed(2)} × ${sheetHeight.toFixed(2)} mm</text>`,
-    `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 32}" class="meta">Preview shows placed parts and internal cuts for sheet-size estimation.</text>`,
+    `<text x="${PAGE_MARGIN}" y="${PAGE_MARGIN + 32}" class="meta">Layout shows placed parts and internal cuts for sheet-size estimation.</text>`,
   ].join("\n");
 }
 

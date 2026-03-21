@@ -10,9 +10,12 @@ Normative rules for the first production SVG phase:
 - Rail geometry belongs on left and right side panels.
 - Rail offset is measured from the top outer edge of the side panel.
 - Rail geometry is excluded from preview-only output.
-- Rail geometry is implemented as a closed rectangular slot in production output.
-- The slot starts after the leading side-panel material margin and stops 3 mm before the opposite end.
-- This is an intermediate fabrication convention for SVG production, pending a final rail profile specification.
+- Rail geometry is implemented as a closed stepped slot in production output.
+- The main groove starts after the leading side-panel material margin and stops 3 mm before the opposite end.
+- The groove height is 3.2 mm over the running length.
+- A loading pocket is added at the leading end of the groove.
+- The loading pocket is 6 mm long and extends 3 mm deeper than the running groove.
+- This stepped loading pocket is the normative Type A SVG rail profile for the current production phase.
 
 Lid:
 - Width = Lint

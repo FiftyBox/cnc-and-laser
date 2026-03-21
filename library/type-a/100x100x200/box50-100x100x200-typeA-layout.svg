@@ -17,12 +17,12 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 .legend-item { font-size: 3.4px; }
 </style>
 <rect x="0" y="0" width="510" height="692.25" fill="#ffffff" />
-<text x="12" y="12" class="title">Box50 Layout Preview</text>
+<text x="12" y="12" class="title">Box50 Layout</text>
 <text x="12" y="20" class="meta">Type A • Material 3 mm • Kerf 0.1 mm</text>
 <text x="12" y="26" class="meta">External 100 × 100 × 200 mm</text>
 <text x="12" y="32" class="meta">Internal 94.00 × 94.00 × 190.75 mm</text>
 <text x="12" y="38" class="meta">Required sheet envelope 320.00 × 610.25 mm</text>
-<text x="12" y="44" class="meta">Preview shows placed parts and internal cuts for sheet-size estimation.</text>
+<text x="12" y="44" class="meta">Layout shows placed parts and internal cuts for sheet-size estimation.</text>
 <rect x="12" y="70" width="320" height="610.25" class="sheet" />
 <g>
 <path d="M 15 73 L 15 70 L 26.75 70 L 26.75 73 L 38.5 73 L 38.5 70 L 50.25 70 L 50.25 73 L 62 73 L 62 70 L 73.75 70 L 73.75 73 L 85.5 73 L 85.5 70 L 97.25 70 L 97.25 73 L 109 73 L 112 73 L 112 84.75 L 109 84.75 L 109 96.5 L 112 96.5 L 112 108.25 L 109 108.25 L 109 120 L 112 120 L 112 131.75 L 109 131.75 L 109 143.5 L 112 143.5 L 112 155.25 L 109 155.25 L 109 167 L 109 170 L 97.25 170 L 97.25 167 L 85.5 167 L 85.5 170 L 73.75 170 L 73.75 167 L 62 167 L 62 170 L 50.25 170 L 50.25 167 L 38.5 167 L 38.5 170 L 26.75 170 L 26.75 167 L 15 167 L 15 155.25 L 12 155.25 L 12 143.5 L 15 143.5 L 15 131.75 L 12 131.75 L 12 120 L 15 120 L 15 108.25 L 12 108.25 L 12 96.5 L 15 96.5 L 15 84.75 L 12 84.75 L 12 73 Z" class="part" />
@@ -51,14 +51,14 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 </g>
 <g>
 <path d="M 15 280 L 109 280 L 112 280 L 112 292.5 L 109 292.5 L 109 305 L 112 305 L 112 317.5 L 109 317.5 L 109 330 L 112 330 L 112 342.5 L 109 342.5 L 109 355 L 112 355 L 112 367.5 L 109 367.5 L 109 380 L 112 380 L 112 392.5 L 109 392.5 L 109 405 L 112 405 L 112 417.5 L 109 417.5 L 109 430 L 112 430 L 112 442.5 L 109 442.5 L 109 455 L 112 455 L 112 467.5 L 109 467.5 L 109 480 L 109 477 L 97.25 477 L 97.25 480 L 85.5 480 L 85.5 477 L 73.75 477 L 73.75 480 L 62 480 L 62 477 L 50.25 477 L 50.25 480 L 38.5 480 L 38.5 477 L 26.75 477 L 26.75 480 L 15 480 L 15 467.5 L 12 467.5 L 12 455 L 15 455 L 15 442.5 L 12 442.5 L 12 430 L 15 430 L 15 417.5 L 12 417.5 L 12 405 L 15 405 L 15 392.5 L 12 392.5 L 12 380 L 15 380 L 15 367.5 L 12 367.5 L 12 355 L 15 355 L 15 342.5 L 12 342.5 L 12 330 L 15 330 L 15 317.5 L 12 317.5 L 12 305 L 15 305 L 15 292.5 L 12 292.5 L 12 280 Z" class="part" />
-<path d="M 15 283 L 109 283 L 109 286.2 L 15 286.2 Z" class="inner-cut" />
+<path d="M 15 283 L 109 283 L 109 286.2 L 21 286.2 L 21 289.2 L 15 289.2 Z" class="inner-cut" />
 <line x1="62" y1="277" x2="62" y2="280" class="marker-line" />
 <circle cx="62" cy="272.5" r="4.5" class="marker-badge" />
 <text x="62" y="272.5" class="marker-text">4</text>
 </g>
 <g>
 <path d="M 125 280 L 219 280 L 222 280 L 222 292.5 L 219 292.5 L 219 305 L 222 305 L 222 317.5 L 219 317.5 L 219 330 L 222 330 L 222 342.5 L 219 342.5 L 219 355 L 222 355 L 222 367.5 L 219 367.5 L 219 380 L 222 380 L 222 392.5 L 219 392.5 L 219 405 L 222 405 L 222 417.5 L 219 417.5 L 219 430 L 222 430 L 222 442.5 L 219 442.5 L 219 455 L 222 455 L 222 467.5 L 219 467.5 L 219 480 L 219 477 L 207.25 477 L 207.25 480 L 195.5 480 L 195.5 477 L 183.75 477 L 183.75 480 L 172 480 L 172 477 L 160.25 477 L 160.25 480 L 148.5 480 L 148.5 477 L 136.75 477 L 136.75 480 L 125 480 L 125 467.5 L 122 467.5 L 122 455 L 125 455 L 125 442.5 L 122 442.5 L 122 430 L 125 430 L 125 417.5 L 122 417.5 L 122 405 L 125 405 L 125 392.5 L 122 392.5 L 122 380 L 125 380 L 125 367.5 L 122 367.5 L 122 355 L 125 355 L 125 342.5 L 122 342.5 L 122 330 L 125 330 L 125 317.5 L 122 317.5 L 122 305 L 125 305 L 125 292.5 L 122 292.5 L 122 280 Z" class="part" />
-<path d="M 125 283 L 219 283 L 219 286.2 L 125 286.2 Z" class="inner-cut" />
+<path d="M 125 283 L 219 283 L 219 286.2 L 131 286.2 L 131 289.2 L 125 289.2 Z" class="inner-cut" />
 <line x1="172" y1="277" x2="172" y2="280" class="marker-line" />
 <circle cx="172" cy="272.5" r="4.5" class="marker-badge" />
 <text x="172" y="272.5" class="marker-text">5</text>
@@ -99,12 +99,12 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 <text x="356" y="130" class="marker-text">4</text>
 <text x="366" y="128" class="legend-item">left-right ×1</text>
 <text x="366" y="133" class="legend-item">100 × 200 mm</text>
-<text x="366" y="138" class="legend-item">Side walls with future lid-rail g…</text>
+<text x="366" y="138" class="legend-item">Side walls with stepped lid-rail …</text>
 <circle cx="356" cy="146" r="4.5" class="marker-badge" />
 <text x="356" y="146" class="marker-text">5</text>
 <text x="366" y="144" class="legend-item">left-right ×1</text>
 <text x="366" y="149" class="legend-item">100 × 200 mm</text>
-<text x="366" y="154" class="legend-item">Side walls with future lid-rail g…</text>
+<text x="366" y="154" class="legend-item">Side walls with stepped lid-rail …</text>
 <circle cx="356" cy="162" r="4.5" class="marker-badge" />
 <text x="356" y="162" class="marker-text">6</text>
 <text x="366" y="160" class="legend-item">lid ×1</text>

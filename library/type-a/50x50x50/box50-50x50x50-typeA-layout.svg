@@ -17,12 +17,12 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 .legend-item { font-size: 3.4px; }
 </style>
 <rect x="0" y="0" width="593.8" height="202" fill="#ffffff" />
-<text x="12" y="12" class="title">Box50 Layout Preview</text>
+<text x="12" y="12" class="title">Box50 Layout</text>
 <text x="12" y="20" class="meta">Type A • Material 3 mm • Kerf 0.1 mm</text>
 <text x="12" y="26" class="meta">External 50 × 50 × 50 mm</text>
 <text x="12" y="32" class="meta">Internal 44.00 × 44.00 × 40.75 mm</text>
 <text x="12" y="38" class="meta">Required sheet envelope 403.80 × 50.00 mm</text>
-<text x="12" y="44" class="meta">Preview shows placed parts and internal cuts for sheet-size estimation.</text>
+<text x="12" y="44" class="meta">Layout shows placed parts and internal cuts for sheet-size estimation.</text>
 <rect x="12" y="70" width="403.8" height="50" class="sheet" />
 <g>
 <path d="M 15 73 L 15 70 L 26 70 L 26 73 L 37 73 L 37 70 L 48 70 L 48 73 L 59 73 L 62 73 L 62 84 L 59 84 L 59 95 L 62 95 L 62 106 L 59 106 L 59 117 L 59 120 L 48 120 L 48 117 L 37 117 L 37 120 L 26 120 L 26 117 L 15 117 L 15 106 L 12 106 L 12 95 L 15 95 L 15 84 L 12 84 L 12 73 Z" class="part" />
@@ -47,14 +47,14 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 </g>
 <g>
 <path d="M 195 70 L 239 70 L 242 70 L 242 82.5 L 239 82.5 L 239 95 L 242 95 L 242 107.5 L 239 107.5 L 239 120 L 239 117 L 228 117 L 228 120 L 217 120 L 217 117 L 206 117 L 206 120 L 195 120 L 195 107.5 L 192 107.5 L 192 95 L 195 95 L 195 82.5 L 192 82.5 L 192 70 Z" class="part" />
-<path d="M 195 73 L 239 73 L 239 76.2 L 195 76.2 Z" class="inner-cut" />
+<path d="M 195 73 L 239 73 L 239 76.2 L 201 76.2 L 201 79.2 L 195 79.2 Z" class="inner-cut" />
 <line x1="217" y1="68.5" x2="217" y2="70" class="marker-line" />
 <circle cx="217" cy="64" r="4.5" class="marker-badge" />
 <text x="217" y="64" class="marker-text">4</text>
 </g>
 <g>
 <path d="M 255 70 L 299 70 L 302 70 L 302 82.5 L 299 82.5 L 299 95 L 302 95 L 302 107.5 L 299 107.5 L 299 120 L 299 117 L 288 117 L 288 120 L 277 120 L 277 117 L 266 117 L 266 120 L 255 120 L 255 107.5 L 252 107.5 L 252 95 L 255 95 L 255 82.5 L 252 82.5 L 252 70 Z" class="part" />
-<path d="M 255 73 L 299 73 L 299 76.2 L 255 76.2 Z" class="inner-cut" />
+<path d="M 255 73 L 299 73 L 299 76.2 L 261 76.2 L 261 79.2 L 255 79.2 Z" class="inner-cut" />
 <line x1="277" y1="68.5" x2="277" y2="70" class="marker-line" />
 <circle cx="277" cy="64" r="4.5" class="marker-badge" />
 <text x="277" y="64" class="marker-text">5</text>
@@ -95,12 +95,12 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 <text x="439.8" y="130" class="marker-text">4</text>
 <text x="449.8" y="128" class="legend-item">left-right ×1</text>
 <text x="449.8" y="133" class="legend-item">50 × 50 mm</text>
-<text x="449.8" y="138" class="legend-item">Side walls with future lid-rail g…</text>
+<text x="449.8" y="138" class="legend-item">Side walls with stepped lid-rail …</text>
 <circle cx="439.8" cy="146" r="4.5" class="marker-badge" />
 <text x="439.8" y="146" class="marker-text">5</text>
 <text x="449.8" y="144" class="legend-item">left-right ×1</text>
 <text x="449.8" y="149" class="legend-item">50 × 50 mm</text>
-<text x="449.8" y="154" class="legend-item">Side walls with future lid-rail g…</text>
+<text x="449.8" y="154" class="legend-item">Side walls with stepped lid-rail …</text>
 <circle cx="439.8" cy="162" r="4.5" class="marker-badge" />
 <text x="439.8" y="162" class="marker-text">6</text>
 <text x="449.8" y="160" class="legend-item">lid ×1</text>

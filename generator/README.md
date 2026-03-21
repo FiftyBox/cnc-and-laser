@@ -10,10 +10,9 @@ Current scope:
 - CLI generation from terminal arguments
 
 Current limitations:
-- Finger-joint geometry is not generated yet
+- Finger-joint geometry is not yet complete on every potential edge convention
 - Divider placement is not generated yet
 - DXF export is not generated yet
-- Sliding lid rail production geometry is not generated yet
 
 ## Commands
 
@@ -27,6 +26,12 @@ Build the generator:
 
 ```bash
 npm run build
+```
+
+Run the automated tests:
+
+```bash
+npm test
 ```
 
 Generate a layout SVG:
@@ -55,24 +60,24 @@ The current layout SVG is a material-layout view:
 - it helps estimate the minimum plate size required
 - it uses numbered markers and an external legend so text does not sit inside the cut geometry
 
-The current cut SVG is the first fabrication-oriented foundation: it outputs only closed panel contours without annotations.
+The current cut SVG is the first fabrication-oriented foundation: it outputs only closed panel contours without annotations and applies kerf compensation at export time.
+
+The upper wall edges stay straight by design in the current Type A model so the sliding-lid opening remains unobstructed.
 
 Currently implemented in cut mode:
+- kerf compensation using the configured kerf value
 - rectangular lid contour
 - Type A vertical wall finger-joints using a 12.5 mm pitch convention
 - Type A wall-to-bottom joints on the lower wall edges
 - Type A bottom panel with matching tenon edges
-- Type A side-panel rail slots as closed rectangular cuts
+- Type A side-panel rail profile as a stepped loading-pocket cut
 - Type A front/back mortise grid at 25 mm spacing
 - first removable Type A divider template with side tenons
 - automatic geometry validation during project generation
 
 Still missing:
-- top and bottom wall finger-joints
 - divider placement presets and counts
-- final sliding-lid rail profile
-- kerf compensation in exported contours
-- stronger topology validation beyond bounds and numeric checks
+- additional topology validation beyond the current orthogonal/self-intersection checks
 
 Legacy compatibility:
 - `--mode preview` is accepted as an alias for `--mode layout`

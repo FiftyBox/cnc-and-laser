@@ -75,12 +75,16 @@ The following rules define the first production-oriented geometry model for Type
 - Dimensions in this specification are nominal design dimensions in millimeters.
 - External dimensions remain exact multiples of 50 mm.
 - Internal dimensions remain derived from the formulas in section 3.
-- The first production SVG uses nominal geometry and does not yet apply automatic kerf compensation to exported contours.
+- Nominal panel geometry remains the design reference for Box50 dimensions.
+- SVG cut output applies automatic kerf compensation to exported contours.
+- Outer contours are offset outward by half the configured kerf.
+- Internal cut contours are offset inward by half the configured kerf.
 
 ### 10.4 Production SVG Output
 - Production SVG files must contain only fabrication geometry.
 - No text, labels, guides, decorative fills, or preview overlays may appear in production output.
 - Each exported part must be represented by one or more closed cut paths.
+- Kerf compensation is applied at SVG cut export time, not by modifying the nominal project dimensions.
 
 ### 10.5 Panel Set
 - Type A production output must include: bottom, front, back, left, right, lid.
@@ -100,7 +104,7 @@ The following rules define the first production-oriented geometry model for Type
 - Front and back panels carry the matching inward mortise pattern on both vertical edges.
 - Front, back, left, and right wall panels carry inward mortise patterns on their bottom edge.
 - The bottom panel carries the matching outward tenon pattern on all four edges.
-- Top wall edges remain straight in this phase.
+- Top wall edges remain straight by design so the sliding-lid opening stays unobstructed.
 - The first production SVG joint implementation is normative for Type A until a later revision replaces it.
 
 ### 10.7 Divider Mortise Convention
@@ -129,8 +133,11 @@ The following rules define the first production-oriented geometry model for Type
 - Rail nominal height is 3.2 mm.
 - Rail offset is 3 mm from the top edge.
 - Rail nominal length is Pext − 3 mm.
-- In the first production SVG implementation, the rail is represented as a closed rectangular slot on left and right side panels.
-- The slot top offset is measured from the top outer edge of the side panel.
-- The slot height is 3.2 mm.
-- The slot starts after the side-panel leading material margin and stops 3 mm before the opposite end.
-- This slot representation is the normative intermediate production convention until the final rail profile is specified.
+- In the current production SVG implementation, the rail is represented as a closed stepped slot on left and right side panels.
+- The groove top offset is measured from the top outer edge of the side panel.
+- The running groove height is 3.2 mm.
+- The running groove starts after the side-panel leading material margin and stops 3 mm before the opposite end.
+- A loading pocket is added at the leading end of the groove.
+- The loading pocket length is 6 mm.
+- The loading pocket extends 3 mm deeper than the running groove.
+- This stepped loading-pocket representation is the normative Type A rail profile for the current production SVG phase.
