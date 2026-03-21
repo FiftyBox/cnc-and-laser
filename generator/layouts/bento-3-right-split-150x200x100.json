@@ -1,0 +1,45 @@
+{
+  "id": "bento-3-right-split-150x200x100",
+  "kind": "type-a-layout",
+  "referenceFrame": "internal",
+  "separators": [
+    {
+      "id": "main-vertical",
+      "orientation": "vertical",
+      "role": "primary",
+      "position": 90,
+      "spanStart": 0,
+      "spanEnd": 194,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "right-horizontal",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    },
+    {
+      "id": "right-horizontal",
+      "orientation": "horizontal",
+      "role": "secondary",
+      "position": 97,
+      "spanStart": 90,
+      "spanEnd": 144,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "main-vertical",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,9 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { createDefaultConfig, createProject } from "./core/box50.js";
 import { renderProjectSvgWithMode } from "./export/svg.js";
+import type { Box50Config, TypeALayoutDefinition } from "./index.js";
 
 type CliRenderMode = "layout" | "cut";
 
@@ -12,16 +14,12 @@ interface CliArgs {
   heightUnits: number;
   mode: CliRenderMode;
   outputPath?: string;
+  layoutJsonPath?: string;
 }
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const config = createDefaultConfig({
-    type: args.type,
-    widthUnits: args.widthUnits,
-    depthUnits: args.depthUnits,
-    heightUnits: args.heightUnits,
-  });
+  const config = await resolveConfigFromCliArgs(args);
 
   const project = createProject(config);
   const svg = renderProjectSvgWithMode(project, args.mode);
@@ -51,6 +49,7 @@ function parseArgs(argv: string[]): CliArgs {
   const heightUnits = Number.parseInt(readOption(argv, "--h"), 10);
   const mode = normalizeMode(readOptionalOption(argv, "--mode") ?? "layout");
   const outputPath = readOptionalOption(argv, "--out");
+  const layoutJsonPath = readOptionalOption(argv, "--layout-json");
 
   if (type !== "A" && type !== "B") {
     throw new Error("--type must be A or B.");
@@ -68,7 +67,46 @@ function parseArgs(argv: string[]): CliArgs {
     cliArgs.outputPath = outputPath;
   }
 
+  if (layoutJsonPath !== undefined) {
+    cliArgs.layoutJsonPath = layoutJsonPath;
+  }
+
   return cliArgs;
+}
+
+export async function resolveConfigFromCliArgs(args: CliArgs): Promise<Box50Config> {
+  const partialConfig: Box50Config = createDefaultConfig({
+    type: args.type,
+    widthUnits: args.widthUnits,
+    depthUnits: args.depthUnits,
+    heightUnits: args.heightUnits,
+  });
+
+  if (args.layoutJsonPath === undefined) {
+    return partialConfig;
+  }
+
+  if (args.type !== "A") {
+    throw new Error("--layout-json is only supported with --type A.");
+  }
+
+  const layout = await loadTypeALayoutFromJson(args.layoutJsonPath);
+  return {
+    ...partialConfig,
+    typeALayout: layout,
+  };
+}
+
+export async function loadTypeALayoutFromJson(layoutJsonPath: string): Promise<TypeALayoutDefinition> {
+  const resolvedPath = path.resolve(process.cwd(), layoutJsonPath);
+  const content = await readFile(resolvedPath, "utf8");
+
+  try {
+    return JSON.parse(content) as TypeALayoutDefinition;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to parse layout JSON ${resolvedPath}: ${message}`);
+  }
 }
 
 function readOption(argv: string[], name: string): string {
@@ -116,12 +154,18 @@ function printHelp(): void {
     "Optional:",
     "  --mode <mode>   layout or cut (default: layout)",
     "                  legacy aliases: preview -> layout, production -> cut",
+    "  --layout-json <path>",
+    "                  JSON file describing a Type A internal layout",
     "  --out <path>    Output SVG path",
   ].join("\n"));
 }
 
-main().catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`${message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`${message}\n`);
+    process.exitCode = 1;
+  });
+}
+
+export { parseArgs };

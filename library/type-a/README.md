@@ -44,4 +44,12 @@ Current generated folders contain:
 - an SVG kerf-compensated cut export with cut paths only
 - a README with dimensions and generation assumptions
 
+Reference layouts may also be stored under:
+
+- examples/
+
+Current reference example:
+
+- examples/bento-3-right-split-150x200x100/
+
 Each folder should describe the box dimensions, internal dimensions, material assumptions, and any generation parameters.

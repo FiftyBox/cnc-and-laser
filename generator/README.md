@@ -8,10 +8,11 @@ Current scope:
 - SVG layout export for sheet estimation
 - SVG cut export foundation
 - CLI generation from terminal arguments
+- Programmatic Type A separator layouts with primary/secondary dividers
 
 Current limitations:
 - Finger-joint geometry is not yet complete on every potential edge convention
-- Divider placement is not generated yet
+- CLI layout authoring is not implemented yet
 - DXF export is not generated yet
 
 ## Commands
@@ -52,6 +53,12 @@ Custom output path:
 npm run generate -- --type B --w 2 --d 2 --h 1 --mode layout --out output/box50-100x100x50-typeB-layout.svg
 ```
 
+Generate from a Type A layout JSON file:
+
+```bash
+npm run generate -- --type A --w 2 --d 4 --h 2 --layout-json layouts/bento.json --mode cut --out output/box50-bento-cut.svg
+```
+
 ## Notes
 
 The current layout SVG is a material-layout view:
@@ -71,13 +78,18 @@ Currently implemented in cut mode:
 - Type A wall-to-bottom joints on the lower wall edges
 - Type A bottom panel with matching tenon edges
 - Type A side-panel rail profile as a stepped loading-pocket cut
-- Type A front/back mortise grid at 25 mm spacing
-- first removable Type A divider template with side tenons
+- legacy removable Type A divider template with side tenons when no explicit layout is provided
+- programmatic Type A layouts with traversing primary separators, partial secondary separators, bottom mortises, primary mortises, and secondary edge tenons
+- wall-lock mortises for separators that reach a box wall
 - automatic geometry validation during project generation
 
 Still missing:
-- divider placement presets and counts
+- configurable wall-lock profiles beyond the current rectangular mortise convention
 - additional topology validation beyond the current orthogonal/self-intersection checks
+
+CLI notes:
+- `--layout-json` loads a JSON file matching the programmatic `TypeALayoutDefinition` shape
+- `--layout-json` is supported only for `--type A`
 
 Legacy compatibility:
 - `--mode preview` is accepted as an alias for `--mode layout`

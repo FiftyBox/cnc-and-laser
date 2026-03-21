@@ -72,11 +72,120 @@ test("createProject builds expected Type A panel set with internal cuts", () => 
   assert.equal(bottom.quantity, 1);
   assert.equal(bottom.cutPaths.length, 1);
   assert.equal(frontBack.quantity, 2);
-  assert.equal(frontBack.cutPaths.length, 4);
+  assert.equal(frontBack.cutPaths.length, 1);
   assert.equal(leftRight.quantity, 2);
   assert.equal(leftRight.cutPaths.length, 2);
   assert.equal(divider.quantity, 1);
   assert.equal(divider.cutPaths.length, 1);
+});
+
+test("createProject builds Type A layout separators and bottom mortises from a bento layout", () => {
+  const project = createProject(createDefaultConfig({
+    type: "A",
+    widthUnits: 2,
+    depthUnits: 4,
+    heightUnits: 2,
+    typeALayout: {
+      id: "bento-3-right-split",
+      kind: "type-a-layout",
+      referenceFrame: "internal",
+      separators: [
+        {
+          id: "main-vertical",
+          orientation: "vertical",
+          role: "primary",
+          position: 60,
+          spanStart: 0,
+          spanEnd: 194,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "right-horizontal",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+        {
+          id: "right-horizontal",
+          orientation: "horizontal",
+          role: "secondary",
+          position: 97,
+          spanStart: 60,
+          spanEnd: 94,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "main-vertical",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+      ],
+    },
+  }));
+
+  assert.equal(project.panels.length, 6);
+  assert.equal(project.panelGeometries.length, 6);
+
+  const bottom = project.panelGeometries.find((panel) => panel.name === "bottom");
+  const frontBack = project.panelGeometries.find((panel) => panel.name === "front-back");
+  const leftRight = project.panelGeometries.find((panel) => panel.name === "left-right");
+  const primarySeparator = project.panelGeometries.find((panel) => panel.name === "separator:main-vertical");
+  const secondarySeparator = project.panelGeometries.find((panel) => panel.name === "separator:right-horizontal");
+  const legacyDivider = project.panelGeometries.find((panel) => panel.name === "divider-depth-template");
+
+  assert.ok(bottom);
+  assert.ok(frontBack);
+  assert.ok(leftRight);
+  assert.ok(primarySeparator);
+  assert.ok(secondarySeparator);
+  assert.equal(legacyDivider, undefined);
+
+  assert.equal(bottom.cutPaths.length, 5);
+  assert.equal(frontBack.cutPaths.length, 2);
+  assert.equal(leftRight.cutPaths.length, 3);
+  assert.equal(primarySeparator.cutPaths.length, 2);
+  assert.equal(secondarySeparator.cutPaths.length, 1);
+});
+
+test("createProject rejects non-traversing primary separators in Type A layouts", () => {
+  assert.throws(
+    () => createProject(createDefaultConfig({
+      type: "A",
+      widthUnits: 2,
+      depthUnits: 4,
+      heightUnits: 2,
+      typeALayout: {
+        id: "invalid-layout",
+        kind: "type-a-layout",
+        referenceFrame: "internal",
+        separators: [
+          {
+            id: "bad-main",
+            orientation: "vertical",
+            role: "primary",
+            position: 60,
+            spanStart: 20,
+            spanEnd: 150,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+          },
+        ],
+      },
+    })),
+    /must be traversing/,
+  );
 });
 
 test("renderProjectSvg defaults to layout mode", () => {
@@ -89,7 +198,8 @@ test("renderProjectSvg defaults to layout mode", () => {
 
   const svg = renderProjectSvg(project);
 
-  assert.match(svg, /Box50 Layout/);
+  assert.match(svg, /Standard Type A/);
+  assert.match(svg, /logo-frame/);
   assert.match(svg, /Placed Parts/);
   assert.match(svg, /marker-badge/);
   assert.doesNotMatch(svg, /class="cut"/);
@@ -231,6 +341,26 @@ test("validatePanelGeometry rejects front-back mortises with wrong dimensions", 
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
+    typeALayout: {
+      id: "wall-lock-reference",
+      kind: "type-a-layout",
+      referenceFrame: "internal",
+      separators: [
+        {
+          id: "main-vertical",
+          orientation: "vertical",
+          role: "primary",
+          position: 60,
+          spanStart: 0,
+          spanEnd: 194,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+        },
+      ],
+    },
   }));
   const frontBack = project.panelGeometries.find((panel) => panel.name === "front-back");
 

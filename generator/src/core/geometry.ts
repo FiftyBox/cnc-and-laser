@@ -33,6 +33,7 @@ export function createTypeABottomPanelGeometry(options: {
   quantity: number;
   note: string;
   materialThickness: number;
+  extraCutPaths?: ClosedPath[];
 }): PanelGeometry {
   return {
     ...options,
@@ -46,6 +47,7 @@ export function createTypeABottomPanelGeometry(options: {
         bottomEdge: "tenon",
         leftEdge: "tenon",
       }),
+      ...(options.extraCutPaths ?? []),
     ],
   };
 }
@@ -86,31 +88,6 @@ export function createTypeARailProfilePath(options: {
   };
 }
 
-export function createTypeADividerMortisePaths(options: {
-  panelWidth: number;
-  panelHeight: number;
-  slotWidth: number;
-  slotHeight: number;
-  gridSpacing: number;
-  firstCenterX: number;
-  bottomOffset: number;
-}): ClosedPath[] {
-  const paths: ClosedPath[] = [];
-  const slotY = options.panelHeight - options.bottomOffset - options.slotHeight;
-
-  for (let centerX = options.firstCenterX; centerX < options.panelWidth; centerX += options.gridSpacing) {
-    const slotX = centerX - (options.slotWidth / 2);
-
-    if (slotX < 0 || slotX + options.slotWidth > options.panelWidth) {
-      continue;
-    }
-
-    paths.push(createOffsetRectanglePath(slotX, slotY, options.slotWidth, options.slotHeight));
-  }
-
-  return paths;
-}
-
 export function createTypeADividerPanelGeometry(options: {
   name: string;
   width: number;
@@ -120,11 +97,67 @@ export function createTypeADividerPanelGeometry(options: {
   tenonDepth: number;
   tenonHeight: number;
   tenonBottomOffset: number;
+  edgeTenons?: Array<{
+    edge: "start" | "end";
+    depth: number;
+    height: number;
+    bottomOffset: number;
+  }>;
+  mortiseCutPaths?: ClosedPath[];
 }): PanelGeometry {
   const bodyLeft = options.tenonDepth;
   const bodyRight = options.width - options.tenonDepth;
   const tenonTopY = options.height - options.tenonBottomOffset - options.tenonHeight;
   const tenonBottomY = options.height - options.tenonBottomOffset;
+  const startEdgeTenon = options.edgeTenons?.find((edgeTenon) => edgeTenon.edge === "start");
+  const endEdgeTenon = options.edgeTenons?.find((edgeTenon) => edgeTenon.edge === "end");
+  const startEdgeTenonTopY = startEdgeTenon === undefined
+    ? undefined
+    : options.height - startEdgeTenon.bottomOffset - startEdgeTenon.height;
+  const startEdgeTenonBottomY = startEdgeTenon === undefined || startEdgeTenonTopY === undefined
+    ? undefined
+    : startEdgeTenonTopY + startEdgeTenon.height;
+  const endEdgeTenonTopY = endEdgeTenon === undefined
+    ? undefined
+    : options.height - endEdgeTenon.bottomOffset - endEdgeTenon.height;
+  const endEdgeTenonBottomY = endEdgeTenon === undefined || endEdgeTenonTopY === undefined
+    ? undefined
+    : endEdgeTenonTopY + endEdgeTenon.height;
+
+  const rightEdgePoints: Point[] = [{ x: bodyRight, y: 0 }];
+
+  if (endEdgeTenon !== undefined && endEdgeTenonTopY !== undefined && endEdgeTenonBottomY !== undefined) {
+    rightEdgePoints.push(
+      { x: bodyRight, y: endEdgeTenonTopY },
+      { x: options.width, y: endEdgeTenonTopY },
+      { x: options.width, y: endEdgeTenonBottomY },
+      { x: bodyRight, y: endEdgeTenonBottomY },
+    );
+  }
+
+  rightEdgePoints.push(
+    { x: bodyRight, y: tenonTopY },
+    { x: options.width, y: tenonTopY },
+    { x: options.width, y: tenonBottomY },
+    { x: bodyRight, y: tenonBottomY },
+    { x: bodyRight, y: options.height },
+    { x: bodyLeft, y: options.height },
+    { x: bodyLeft, y: tenonBottomY },
+    { x: 0, y: tenonBottomY },
+    { x: 0, y: tenonTopY },
+    { x: bodyLeft, y: tenonTopY },
+  );
+
+  const leftEdgePoints: Point[] = [];
+
+  if (startEdgeTenon !== undefined && startEdgeTenonTopY !== undefined && startEdgeTenonBottomY !== undefined) {
+    leftEdgePoints.push(
+      { x: bodyLeft, y: startEdgeTenonBottomY },
+      { x: 0, y: startEdgeTenonBottomY },
+      { x: 0, y: startEdgeTenonTopY },
+      { x: bodyLeft, y: startEdgeTenonTopY },
+    );
+  }
 
   return {
     ...options,
@@ -132,19 +165,11 @@ export function createTypeADividerPanelGeometry(options: {
       {
         points: dedupeSequentialPoints([
           { x: bodyLeft, y: 0 },
-          { x: bodyRight, y: 0 },
-          { x: bodyRight, y: tenonTopY },
-          { x: options.width, y: tenonTopY },
-          { x: options.width, y: tenonBottomY },
-          { x: bodyRight, y: tenonBottomY },
-          { x: bodyRight, y: options.height },
-          { x: bodyLeft, y: options.height },
-          { x: bodyLeft, y: tenonBottomY },
-          { x: 0, y: tenonBottomY },
-          { x: 0, y: tenonTopY },
-          { x: bodyLeft, y: tenonTopY },
+          ...rightEdgePoints,
+          ...leftEdgePoints,
         ]),
       },
+      ...(options.mortiseCutPaths ?? []),
     ],
   };
 }

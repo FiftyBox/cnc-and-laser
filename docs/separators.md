@@ -11,15 +11,22 @@ Mortises:
 Optional bottom grooves.
 
 Normative rules for the first production SVG phase:
-- Front and back panels receive rectangular mortise slots on a 25 mm horizontal grid.
-- Mortise centers are aligned at 25 mm from the left outer edge, then every 25 mm until the last valid center.
-- Mortise size is 3.1 mm × 4.5 mm in the first production SVG implementation.
-- Mortise bottom edge is positioned 6 mm above the bottom outer edge of the panel.
 - The first production SVG implementation includes one removable divider template spanning the internal depth.
 - Divider body height is Hint − 0.5 mm.
 - Divider side tenons are 2.9 mm deep and 3.5 mm high.
 - Divider tenon bottom edge is positioned 3 mm above the divider bottom edge.
 - Bottom grooves remain optional and excluded from the first production SVG milestone.
+
+Normative rules for the first programmable Type A layout phase:
+- A Type A layout may declare primary and secondary separators in the internal coordinate frame.
+- A primary separator is always traversing across the full internal axis in its orientation.
+- A secondary separator may be partial.
+- Every separator keeps a bottom joint in V1.
+- Bottom anchoring is generated as rectangular mortises in the bottom panel.
+- Primary separators receive separator-to-separator mortises.
+- Secondary separators receive the corresponding edge tenons.
+- In V1, a secondary separator must meet its primary separator at its start edge or end edge.
+- When a separator reaches a box wall, the corresponding wall-lock mortise is generated in that wall panel.
 
 ## Type B (fixed)
 - Finger‑jointed
