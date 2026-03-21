@@ -1,0 +1,21 @@
+{
+  "name": "@fiftybox/box50-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript generator for Box50 CNC and laser-cut boxes",
+  "type": "module",
+  "bin": {
+    "box50-generator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "npm run build && node dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "typescript": "^5.8.2"
+  }
+}

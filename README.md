@@ -20,6 +20,14 @@ See the docs/ directory for full details.
 - Fully documented formulas
 - Generator-ready architecture
 
+## Library
+
+Pre-generated boxes are stored in library/:
+- Type A boxes are grouped by external size
+- Type B boxes are grouped by publisher, then by game
+
+This keeps universal boxes easy to browse by dimensions, and game-specific boxes easy to find by their canonical commercial name.
+
 ## License
 MIT License. See LICENSE.
 
