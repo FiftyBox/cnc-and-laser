@@ -1,0 +1,45 @@
+{
+  "id": "l-simple-150x200x100",
+  "kind": "type-a-layout",
+  "referenceFrame": "internal",
+  "separators": [
+    {
+      "id": "main-horizontal",
+      "orientation": "horizontal",
+      "role": "primary",
+      "position": 110,
+      "spanStart": 0,
+      "spanEnd": 144,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "top-vertical",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    },
+    {
+      "id": "top-vertical",
+      "orientation": "vertical",
+      "role": "secondary",
+      "position": 48,
+      "spanStart": 0,
+      "spanEnd": 110,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "main-horizontal",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    }
+  ]
+}

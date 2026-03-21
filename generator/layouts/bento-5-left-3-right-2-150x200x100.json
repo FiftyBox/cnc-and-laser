@@ -1,0 +1,91 @@
+{
+  "id": "bento-5-left-3-right-2-150x200x100",
+  "kind": "type-a-layout",
+  "referenceFrame": "internal",
+  "separators": [
+    {
+      "id": "main-vertical",
+      "orientation": "vertical",
+      "role": "primary",
+      "position": 72,
+      "spanStart": 0,
+      "spanEnd": 194,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "left-top",
+          "mode": "mortise-primary-tenon-secondary"
+        },
+        {
+          "with": "left-bottom",
+          "mode": "mortise-primary-tenon-secondary"
+        },
+        {
+          "with": "right-middle",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    },
+    {
+      "id": "left-top",
+      "orientation": "horizontal",
+      "role": "secondary",
+      "position": 58,
+      "spanStart": 0,
+      "spanEnd": 72,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "main-vertical",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    },
+    {
+      "id": "left-bottom",
+      "orientation": "horizontal",
+      "role": "secondary",
+      "position": 136,
+      "spanStart": 0,
+      "spanEnd": 72,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "main-vertical",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    },
+    {
+      "id": "right-middle",
+      "orientation": "horizontal",
+      "role": "secondary",
+      "position": 97,
+      "spanStart": 72,
+      "spanEnd": 144,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      },
+      "crossJoints": [
+        {
+          "with": "main-vertical",
+          "mode": "mortise-primary-tenon-secondary"
+        }
+      ]
+    }
+  ]
+}

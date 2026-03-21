@@ -35,7 +35,7 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 <rect x="6.2" y="6.2" width="2.1" height="2.1" class="logo-solid" rx="0.5" />
 <rect x="17.7" y="6.2" width="2.1" height="2.1" class="logo-solid" rx="0.5" />
 </g>
-<text x="48" y="17" class="subtitle">Bento 3 Right Split 150x200x100</text>
+<text x="48" y="17" class="subtitle">Bento 3 Left Split 150x200x100</text>
 <text x="48" y="24" class="meta">Type A • Material 3 mm • Kerf 0.1 mm</text>
 <text x="48" y="30" class="meta">External 150 × 200 × 100 mm</text>
 <text x="48" y="36" class="meta">Internal 144.00 × 194.00 × 90.75 mm</text>
@@ -44,10 +44,10 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 <rect x="12" y="70" width="410" height="470.25" class="sheet" />
 <g>
 <path d="M 209 73 L 212 73 L 212 85 L 209 85 L 209 97 L 212 97 L 212 109 L 209 109 L 209 121 L 212 121 L 212 133 L 209 133 L 209 145 L 212 145 L 212 157 L 209 157 L 209 169 L 212 169 L 212 181 L 209 181 L 209 193 L 212 193 L 212 205 L 209 205 L 209 217 L 209 220 L 196.875 220 L 196.875 217 L 184.75 217 L 184.75 220 L 172.625 220 L 172.625 217 L 160.5 217 L 160.5 220 L 148.375 220 L 148.375 217 L 136.25 217 L 136.25 220 L 124.125 220 L 124.125 217 L 112 217 L 112 220 L 99.875 220 L 99.875 217 L 87.75 217 L 87.75 220 L 75.625 220 L 75.625 217 L 63.5 217 L 63.5 220 L 51.375 220 L 51.375 217 L 39.25 217 L 39.25 220 L 27.125 220 L 27.125 217 L 15 217 L 12 217 L 12 205 L 15 205 L 15 193 L 12 193 L 12 181 L 15 181 L 15 169 L 12 169 L 12 157 L 15 157 L 15 145 L 12 145 L 12 133 L 15 133 L 15 121 L 12 121 L 12 109 L 15 109 L 15 97 L 12 97 L 12 85 L 15 85 L 15 73 L 27.125 73 L 27.125 70 L 39.25 70 L 39.25 73 L 51.375 73 L 51.375 70 L 63.5 70 L 63.5 73 L 75.625 73 L 75.625 70 L 87.75 70 L 87.75 73 L 99.875 73 L 99.875 70 L 112 70 L 112 73 L 124.125 73 L 124.125 70 L 136.25 70 L 136.25 73 L 148.375 73 L 148.375 70 L 160.5 70 L 160.5 73 L 172.625 73 L 172.625 70 L 184.75 70 L 184.75 73 L 196.875 73 L 196.875 70 L 209 70 Z" class="part" />
-<path d="M 199.25 161.45 L 199.25 164.55 L 194.75 164.55 L 194.75 161.45 Z" class="inner-cut" />
-<path d="M 29.25 161.45 L 29.25 164.55 L 24.75 164.55 L 24.75 161.45 Z" class="inner-cut" />
-<path d="M 113.55 172.75 L 113.55 177.25 L 110.45 177.25 L 110.45 172.75 Z" class="inner-cut" />
-<path d="M 113.55 202.75 L 113.55 207.25 L 110.45 207.25 L 110.45 202.75 Z" class="inner-cut" />
+<path d="M 199.25 125.45 L 199.25 128.55 L 194.75 128.55 L 194.75 125.45 Z" class="inner-cut" />
+<path d="M 29.25 125.45 L 29.25 128.55 L 24.75 128.55 L 24.75 125.45 Z" class="inner-cut" />
+<path d="M 113.55 82.75 L 113.55 87.25 L 110.45 87.25 L 110.45 82.75 Z" class="inner-cut" />
+<path d="M 113.55 112.75 L 113.55 117.25 L 110.45 117.25 L 110.45 112.75 Z" class="inner-cut" />
 
 <line x1="112" y1="68.5" x2="112" y2="70" class="marker-line" />
 <circle cx="112" cy="64" r="4.5" class="marker-badge" />
@@ -93,7 +93,7 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 </g>
 <g>
 <path d="M 12 440.25 L 162 440.25 L 159 440.25 L 159 452.75 L 162 452.75 L 162 465.25 L 159 465.25 L 159 477.75 L 162 477.75 L 162 490.25 L 159 490.25 L 159 502.75 L 162 502.75 L 162 515.25 L 159 515.25 L 159 527.75 L 162 527.75 L 162 540.25 L 162 537.25 L 149.5 537.25 L 149.5 540.25 L 137 540.25 L 137 537.25 L 124.5 537.25 L 124.5 540.25 L 112 540.25 L 112 537.25 L 99.5 537.25 L 99.5 540.25 L 87 540.25 L 87 537.25 L 74.5 537.25 L 74.5 540.25 L 62 540.25 L 62 537.25 L 49.5 537.25 L 49.5 540.25 L 37 540.25 L 37 537.25 L 24.5 537.25 L 24.5 540.25 L 12 540.25 L 12 527.75 L 15 527.75 L 15 515.25 L 12 515.25 L 12 502.75 L 15 502.75 L 15 490.25 L 12 490.25 L 12 477.75 L 15 477.75 L 15 465.25 L 12 465.25 L 12 452.75 L 15 452.75 L 15 440.25 Z" class="part" />
-<path d="M 103.45 527.25 L 106.55 527.25 L 106.55 531.75 L 103.45 531.75 Z" class="inner-cut" />
+<path d="M 67.45 527.25 L 70.55 527.25 L 70.55 531.75 L 67.45 531.75 Z" class="inner-cut" />
 
 <line x1="87" y1="437.25" x2="87" y2="440.25" class="marker-line" />
 <circle cx="87" cy="432.75" r="4.5" class="marker-badge" />
@@ -101,7 +101,7 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 </g>
 <g>
 <path d="M 172 440.25 L 322 440.25 L 319 440.25 L 319 452.75 L 322 452.75 L 322 465.25 L 319 465.25 L 319 477.75 L 322 477.75 L 322 490.25 L 319 490.25 L 319 502.75 L 322 502.75 L 322 515.25 L 319 515.25 L 319 527.75 L 322 527.75 L 322 540.25 L 322 537.25 L 309.5 537.25 L 309.5 540.25 L 297 540.25 L 297 537.25 L 284.5 537.25 L 284.5 540.25 L 272 540.25 L 272 537.25 L 259.5 537.25 L 259.5 540.25 L 247 540.25 L 247 537.25 L 234.5 537.25 L 234.5 540.25 L 222 540.25 L 222 537.25 L 209.5 537.25 L 209.5 540.25 L 197 540.25 L 197 537.25 L 184.5 537.25 L 184.5 540.25 L 172 540.25 L 172 527.75 L 175 527.75 L 175 515.25 L 172 515.25 L 172 502.75 L 175 502.75 L 175 490.25 L 172 490.25 L 172 477.75 L 175 477.75 L 175 465.25 L 172 465.25 L 172 452.75 L 175 452.75 L 175 440.25 Z" class="part" />
-<path d="M 263.45 527.25 L 266.55 527.25 L 266.55 531.75 L 263.45 531.75 Z" class="inner-cut" />
+<path d="M 227.45 527.25 L 230.55 527.25 L 230.55 531.75 L 227.45 531.75 Z" class="inner-cut" />
 
 <line x1="247" y1="437.25" x2="247" y2="440.25" class="marker-line" />
 <circle cx="247" cy="432.75" r="4.5" class="marker-badge" />
@@ -157,7 +157,7 @@ text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
 <text x="458" y="200" class="legend-item">Main walls. Universal layout, rem…</text>
 <circle cx="446" cy="209" r="4.5" class="marker-badge" />
 <text x="446" y="209" class="marker-text">8</text>
-<text x="458" y="207" class="legend-item">Separator right horizontal ×1</text>
+<text x="458" y="207" class="legend-item">Separator left horizontal ×1</text>
 <text x="458" y="212" class="legend-item">59.8 × 90.25 mm</text>
 <text x="458" y="217" class="legend-item">Type A secondary separator, horiz…</text>
 </g>

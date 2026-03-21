@@ -7,10 +7,19 @@ export type SvgRenderMode = "layout" | "cut";
 interface PositionedPanelGeometry extends PanelGeometry {
   x: number;
   y: number;
+  originalWidth: number;
+  originalHeight: number;
+  rotated: boolean;
 }
 
 interface PreviewPanelPlacement extends PositionedPanelGeometry {
   previewNumber: number;
+}
+
+interface PreviewPictogram {
+  kind: "lid" | "separator";
+  label?: "P" | "S";
+  orientation?: "horizontal" | "vertical";
 }
 
 const PAGE_MARGIN = 12;
@@ -19,6 +28,7 @@ const HEADER_HEIGHT = 58;
 const LEGEND_GAP = 16;
 const LEGEND_WIDTH = 168;
 const MARKER_RADIUS = 4.5;
+const SIDEBAR_SECTION_GAP = 10;
 const HEADER_LOGO_SIZE = 26;
 const HEADER_CONTENT_X = PAGE_MARGIN + HEADER_LOGO_SIZE + 10;
 
@@ -39,14 +49,14 @@ function renderLayoutSvg(project: Box50Project): string {
       previewNumber: index + 1,
     } satisfies PreviewPanelPlacement));
 
-  const contentWidth = positionedPanels.reduce((max, panel) => Math.max(max, panel.x + panel.width), 0);
-  const contentHeight = positionedPanels.reduce((max, panel) => Math.max(max, panel.y + panel.height), 0);
-  const sheetWidth = contentWidth - PAGE_MARGIN;
-  const sheetHeight = contentHeight - (PAGE_MARGIN + HEADER_HEIGHT);
+  const layoutBounds = getPositionedPanelsBounds(positionedPanels);
+  const sheetWidth = layoutBounds.maxX - PAGE_MARGIN;
+  const sheetHeight = layoutBounds.maxY - (PAGE_MARGIN + HEADER_HEIGHT);
   const legendX = PAGE_MARGIN + sheetWidth + LEGEND_GAP;
   const legendBottom = renderLegendBottom(positionedPanels);
+  const assemblyPlan = renderAssemblyPlan(project, positionedPanels, legendX, legendBottom + SIDEBAR_SECTION_GAP);
   const width = legendX + LEGEND_WIDTH + PAGE_MARGIN;
-  const height = Math.max(contentHeight + PAGE_MARGIN, legendBottom + PAGE_MARGIN);
+  const height = Math.max(layoutBounds.maxY + PAGE_MARGIN, assemblyPlan.bottom + PAGE_MARGIN);
 
   const panelMarkup = positionedPanels.map((panel) => renderPreviewPanel(panel)).join("\n");
   const summaryMarkup = renderSummary(project, sheetWidth, sheetHeight);
@@ -72,6 +82,9 @@ function renderLayoutSvg(project: Box50Project): string {
     `.marker-line { stroke: #64748b; stroke-width: 0.35; }`,
     `.marker-badge { fill: #ffffff; stroke: #0f172a; stroke-width: 0.35; }`,
     `.marker-text { font-size: 3.2px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }`,
+    `.pictogram-line { fill: none; stroke: #0f172a; stroke-width: 0.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }`,
+    `.pictogram-chip { fill: #ffffff; stroke: #0f172a; stroke-width: 0.5; }`,
+    `.pictogram-text { font-size: 4px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #0f172a; }`,
     `.legend-box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 0.4; }`,
     `.legend-title { font-size: 5px; font-weight: 700; }`,
     `.legend-item { font-size: 3.4px; }`,
@@ -81,6 +94,7 @@ function renderLayoutSvg(project: Box50Project): string {
     envelopeMarkup,
     panelMarkup,
     legendMarkup,
+    assemblyPlan.markup,
     `</svg>`,
   ].join("\n");
 }
@@ -161,20 +175,43 @@ function renderPreviewPanel(panel: PreviewPanelPlacement): string {
     const translatedPath = translateClosedPath(path, { x: panel.x, y: panel.y });
     return `<path d="${toSvgPathData(translatedPath)}" class="inner-cut" />`;
   }).join("\n");
-  const markerMarkup = renderPreviewMarker(panel);
+  const pictogramMarkup = renderPreviewPictogram(panel, translatedOuterPath);
+  const markerMarkup = renderPreviewMarker(panel, translatedOuterPath);
 
   return [
     `<g>`,
     `<path d="${toSvgPathData(translatedOuterPath)}" class="part" />`,
     innerCutMarkup,
+    pictogramMarkup,
     markerMarkup,
     `</g>`,
   ].join("\n");
 }
 
-function renderPreviewMarker(panel: PreviewPanelPlacement): string {
-  const anchorX = panel.x + (panel.width / 2);
-  const anchorY = panel.y;
+function getPositionedPanelsBounds(panels: PositionedPanelGeometry[]): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
+  const translatedPoints = panels.flatMap((panel) => panel.cutPaths.flatMap((path) => translateClosedPath(path, { x: panel.x, y: panel.y }).points));
+
+  if (translatedPoints.length === 0) {
+    return {
+      minX: PAGE_MARGIN,
+      minY: PAGE_MARGIN + HEADER_HEIGHT,
+      maxX: PAGE_MARGIN,
+      maxY: PAGE_MARGIN + HEADER_HEIGHT,
+    };
+  }
+
+  return getPointsBounds(translatedPoints);
+}
+
+function renderPreviewMarker(panel: PreviewPanelPlacement, translatedOuterPath: { points: Array<{ x: number; y: number }> }): string {
+  const outerBounds = getPointsBounds(translatedOuterPath.points);
+  const anchorX = (outerBounds.minX + outerBounds.maxX) / 2;
+  const anchorY = outerBounds.minY;
   const badgeCenterY = Math.max(PAGE_MARGIN + HEADER_HEIGHT - 6, anchorY - (MARKER_RADIUS + 3));
   const connectorTopY = badgeCenterY + MARKER_RADIUS;
 
@@ -183,6 +220,129 @@ function renderPreviewMarker(panel: PreviewPanelPlacement): string {
     `<circle cx="${anchorX}" cy="${badgeCenterY}" r="${MARKER_RADIUS}" class="marker-badge" />`,
     `<text x="${anchorX}" y="${badgeCenterY}" class="marker-text">${panel.previewNumber}</text>`,
   ].join("\n");
+}
+
+function renderPreviewPictogram(panel: PreviewPanelPlacement, translatedOuterPath: { points: Array<{ x: number; y: number }> }): string {
+  const pictogram = resolvePreviewPictogram(panel);
+
+  if (pictogram === undefined) {
+    return "";
+  }
+
+  const bounds = getPointsBounds(translatedOuterPath.points);
+  const centerX = (bounds.minX + bounds.maxX) / 2;
+  const centerY = (bounds.minY + bounds.maxY) / 2;
+  const availableWidth = bounds.maxX - bounds.minX;
+  const availableHeight = bounds.maxY - bounds.minY;
+
+  if (pictogram.kind === "lid") {
+    return renderLidPictogram(centerX, centerY, availableWidth, availableHeight);
+  }
+
+  return renderSeparatorPictogram(centerX, centerY, availableWidth, availableHeight, pictogram);
+}
+
+function resolvePreviewPictogram(panel: PreviewPanelPlacement): PreviewPictogram | undefined {
+  if (panel.name === "lid") {
+    return { kind: "lid" };
+  }
+
+  if (!panel.name.startsWith("separator:")) {
+    return undefined;
+  }
+
+  const label = panel.note.includes("primary separator") ? "P" : panel.note.includes("secondary separator") ? "S" : undefined;
+  const orientation = panel.note.includes(", vertical span")
+    ? "vertical"
+    : panel.note.includes(", horizontal span")
+      ? "horizontal"
+      : undefined;
+
+  if (label === undefined || orientation === undefined) {
+    return undefined;
+  }
+
+  return {
+    kind: "separator",
+    label,
+    orientation,
+  };
+}
+
+function renderLidPictogram(centerX: number, centerY: number, availableWidth: number, availableHeight: number): string {
+  const horizontal = availableWidth >= availableHeight;
+  const length = Math.max(16, Math.min(horizontal ? availableWidth - 16 : availableHeight - 16, 34));
+  const arrowSize = 3.5;
+
+  if (horizontal) {
+    const startX = centerX - (length / 2);
+    const endX = centerX + (length / 2);
+
+    return [
+      `<line x1="${startX}" y1="${centerY}" x2="${endX}" y2="${centerY}" class="pictogram-line" />`,
+      `<path d="M ${startX + arrowSize} ${centerY - arrowSize} L ${startX} ${centerY} L ${startX + arrowSize} ${centerY + arrowSize}" class="pictogram-line" />`,
+      `<path d="M ${endX - arrowSize} ${centerY - arrowSize} L ${endX} ${centerY} L ${endX - arrowSize} ${centerY + arrowSize}" class="pictogram-line" />`,
+    ].join("\n");
+  }
+
+  const startY = centerY - (length / 2);
+  const endY = centerY + (length / 2);
+
+  return [
+    `<line x1="${centerX}" y1="${startY}" x2="${centerX}" y2="${endY}" class="pictogram-line" />`,
+    `<path d="M ${centerX - arrowSize} ${startY + arrowSize} L ${centerX} ${startY} L ${centerX + arrowSize} ${startY + arrowSize}" class="pictogram-line" />`,
+    `<path d="M ${centerX - arrowSize} ${endY - arrowSize} L ${centerX} ${endY} L ${centerX + arrowSize} ${endY - arrowSize}" class="pictogram-line" />`,
+  ].join("\n");
+}
+
+function renderSeparatorPictogram(
+  centerX: number,
+  centerY: number,
+  availableWidth: number,
+  availableHeight: number,
+  pictogram: PreviewPictogram,
+): string {
+  const chipRadius = 5;
+  const lineLength = Math.max(16, Math.min((pictogram.orientation === "horizontal" ? availableWidth : availableHeight) - 18, 28));
+
+  if (pictogram.orientation === "horizontal") {
+    const startX = centerX - (lineLength / 2);
+    const endX = centerX + (lineLength / 2);
+
+    return [
+      `<line x1="${startX}" y1="${centerY}" x2="${endX}" y2="${centerY}" class="pictogram-line" />`,
+      `<circle cx="${centerX}" cy="${centerY}" r="${chipRadius}" class="pictogram-chip" />`,
+      `<text x="${centerX}" y="${centerY}" class="pictogram-text">${pictogram.label ?? "?"}</text>`,
+    ].join("\n");
+  }
+
+  const startY = centerY - (lineLength / 2);
+  const endY = centerY + (lineLength / 2);
+
+  return [
+    `<line x1="${centerX}" y1="${startY}" x2="${centerX}" y2="${endY}" class="pictogram-line" />`,
+    `<circle cx="${centerX}" cy="${centerY}" r="${chipRadius}" class="pictogram-chip" />`,
+    `<text x="${centerX}" y="${centerY}" class="pictogram-text">${pictogram.label ?? "?"}</text>`,
+  ].join("\n");
+}
+
+function getPointsBounds(points: Array<{ x: number; y: number }>): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
+  return points.reduce((bounds, point) => ({
+    minX: Math.min(bounds.minX, point.x),
+    minY: Math.min(bounds.minY, point.y),
+    maxX: Math.max(bounds.maxX, point.x),
+    maxY: Math.max(bounds.maxY, point.y),
+  }), {
+    minX: points[0]!.x,
+    minY: points[0]!.y,
+    maxX: points[0]!.x,
+    maxY: points[0]!.y,
+  });
 }
 
 function escapeXml(value: string): string {
@@ -195,33 +355,270 @@ function escapeXml(value: string): string {
 }
 
 function layoutPanelGeometries(panels: PanelGeometry[], startX = PAGE_MARGIN, startY = PAGE_MARGIN): PositionedPanelGeometry[] {
-  const positioned: PositionedPanelGeometry[] = [];
-  let currentX = startX;
-  let currentY = startY;
-  let rowHeight = 0;
-  const maxRowWidth = 420;
+  const expandedPanels = panels.flatMap((panel) => Array.from({ length: panel.quantity }, () => ({
+    ...panel,
+    quantity: 1,
+    x: 0,
+    y: 0,
+    originalWidth: panel.width,
+    originalHeight: panel.height,
+    rotated: false,
+  } satisfies PositionedPanelGeometry)));
+  const packedPanels = packPanelGeometries(expandedPanels);
 
-  for (const panel of panels) {
-    for (let index = 0; index < panel.quantity; index += 1) {
-      if (currentX > startX && currentX + panel.width > maxRowWidth) {
-        currentX = startX;
-        currentY += rowHeight + PANEL_GAP;
-        rowHeight = 0;
-      }
+  return packedPanels.map((panel) => ({
+    ...panel,
+    x: panel.x + startX,
+    y: panel.y + startY,
+  }));
+}
 
-      positioned.push({
-        ...panel,
-        quantity: 1,
-        x: currentX,
-        y: currentY,
-      });
+interface PackedShelf {
+  y: number;
+  height: number;
+  usedWidth: number;
+}
 
-      currentX += panel.width + PANEL_GAP;
-      rowHeight = Math.max(rowHeight, panel.height);
+interface PackedLayout {
+  panels: PositionedPanelGeometry[];
+  score: number;
+}
+
+interface SidebarSectionMarkup {
+  markup: string;
+  bottom: number;
+}
+
+function packPanelGeometries(panels: PositionedPanelGeometry[]): PositionedPanelGeometry[] {
+  if (panels.length === 0) {
+    return [];
+  }
+
+  const sortedPanels = [...panels].sort(comparePanelsForPacking);
+  const candidateWidths = buildPackingWidthCandidates(sortedPanels);
+  let bestLayout: PackedLayout | undefined;
+
+  for (const candidateWidth of candidateWidths) {
+    const packedLayout = packPanelsForWidth(sortedPanels, candidateWidth);
+
+    if (packedLayout === undefined) {
+      continue;
+    }
+
+    if (bestLayout === undefined || packedLayout.score < bestLayout.score) {
+      bestLayout = packedLayout;
     }
   }
 
-  return positioned;
+  if (bestLayout === undefined) {
+    throw new Error("Failed to place panel geometries on the layout sheet.");
+  }
+
+  return bestLayout.panels;
+}
+
+function packPanelsForWidth(panels: PositionedPanelGeometry[], sheetWidth: number): PackedLayout | undefined {
+  const shelves: PackedShelf[] = [];
+  const packedPanels: PositionedPanelGeometry[] = [];
+
+  for (const panel of panels) {
+    const variants = createPackingVariants(panel);
+    let selectedPlacement: {
+      variant: PositionedPanelGeometry;
+      shelfIndex: number;
+      x: number;
+      y: number;
+      isNewShelf: boolean;
+    } | undefined;
+
+    for (const variant of variants) {
+      for (let shelfIndex = 0; shelfIndex < shelves.length; shelfIndex += 1) {
+        const shelf = shelves[shelfIndex];
+
+        if (shelf === undefined || variant.height > shelf.height) {
+          continue;
+        }
+
+        const x = shelf.usedWidth === 0 ? 0 : shelf.usedWidth + PANEL_GAP;
+
+        if ((x + variant.width) > sheetWidth) {
+          continue;
+        }
+
+        if (selectedPlacement === undefined) {
+          selectedPlacement = {
+            variant,
+            shelfIndex,
+            x,
+            y: shelf.y,
+            isNewShelf: false,
+          };
+          continue;
+        }
+
+        const currentRight = selectedPlacement.x + selectedPlacement.variant.width;
+        const candidateRight = x + variant.width;
+
+        if (candidateRight < currentRight || (candidateRight === currentRight && shelf.y < selectedPlacement.y)) {
+          selectedPlacement = {
+            variant,
+            shelfIndex,
+            x,
+            y: shelf.y,
+            isNewShelf: false,
+          };
+        }
+      }
+    }
+
+    if (selectedPlacement === undefined) {
+      for (const variant of variants) {
+        if (variant.width > sheetWidth) {
+          continue;
+        }
+
+        const y = shelves.length === 0
+          ? 0
+          : shelves[shelves.length - 1]!.y + shelves[shelves.length - 1]!.height + PANEL_GAP;
+
+        if (selectedPlacement === undefined || variant.height < selectedPlacement.variant.height || (variant.height === selectedPlacement.variant.height && variant.width < selectedPlacement.variant.width)) {
+          selectedPlacement = {
+            variant,
+            shelfIndex: shelves.length,
+            x: 0,
+            y,
+            isNewShelf: true,
+          };
+        }
+      }
+    }
+
+    if (selectedPlacement === undefined) {
+      return undefined;
+    }
+
+    packedPanels.push({
+      ...selectedPlacement.variant,
+      x: selectedPlacement.x,
+      y: selectedPlacement.y,
+    });
+
+    if (selectedPlacement.isNewShelf) {
+      shelves.push({
+        y: selectedPlacement.y,
+        height: selectedPlacement.variant.height,
+        usedWidth: selectedPlacement.variant.width,
+      });
+      continue;
+    }
+
+    const shelf = shelves[selectedPlacement.shelfIndex];
+
+    if (shelf === undefined) {
+      throw new Error("Packing shelf must exist.");
+    }
+
+    shelf.usedWidth = selectedPlacement.x + selectedPlacement.variant.width;
+  }
+
+  const usedWidth = shelves.reduce((max, shelf) => Math.max(max, shelf.usedWidth), 0);
+  const usedHeight = shelves.length === 0
+    ? 0
+    : shelves[shelves.length - 1]!.y + shelves[shelves.length - 1]!.height;
+
+  return {
+    panels: packedPanels,
+    score: calculatePackingScore(usedWidth, usedHeight),
+  };
+}
+
+function calculatePackingScore(width: number, height: number): number {
+  if (width <= 0 || height <= 0) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const area = width * height;
+  const aspectRatio = Math.max(width, height) / Math.min(width, height);
+  return area * aspectRatio;
+}
+
+function buildPackingWidthCandidates(panels: PositionedPanelGeometry[]): number[] {
+  const maxPanelWidth = panels.reduce((max, panel) => Math.max(max, panel.width, panel.height), 0);
+  const totalArea = panels.reduce((sum, panel) => sum + (panel.width * panel.height), 0);
+  const dominantWidths = [...panels]
+    .map((panel) => Math.max(panel.width, panel.height))
+    .sort((left, right) => right - left);
+  const narrowWidths = [...panels]
+    .map((panel) => Math.min(panel.width, panel.height))
+    .sort((left, right) => right - left);
+  const candidates = new Set<number>([
+    maxPanelWidth,
+    Math.ceil(Math.sqrt(totalArea)),
+    Math.ceil(Math.sqrt(totalArea) * 1.15),
+    Math.ceil(Math.sqrt(totalArea) * 1.3),
+  ]);
+
+  let dominantCumulative = 0;
+
+  for (let index = 0; index < dominantWidths.length; index += 1) {
+    dominantCumulative += dominantWidths[index] ?? 0;
+    candidates.add(dominantCumulative + (index * PANEL_GAP));
+  }
+
+  let narrowCumulative = 0;
+
+  for (let index = 0; index < narrowWidths.length; index += 1) {
+    narrowCumulative += narrowWidths[index] ?? 0;
+    candidates.add(Math.max(maxPanelWidth, narrowCumulative + (index * PANEL_GAP)));
+  }
+
+  return [...candidates]
+    .filter((candidate) => Number.isFinite(candidate) && candidate >= maxPanelWidth)
+    .sort((left, right) => left - right);
+}
+
+function comparePanelsForPacking(left: PositionedPanelGeometry, right: PositionedPanelGeometry): number {
+  const leftMaxDimension = Math.max(left.width, left.height);
+  const rightMaxDimension = Math.max(right.width, right.height);
+
+  if (leftMaxDimension !== rightMaxDimension) {
+    return rightMaxDimension - leftMaxDimension;
+  }
+
+  if (left.height !== right.height) {
+    return right.height - left.height;
+  }
+
+  if (left.width !== right.width) {
+    return right.width - left.width;
+  }
+
+  return left.name.localeCompare(right.name);
+}
+
+function createPackingVariants(panel: PositionedPanelGeometry): PositionedPanelGeometry[] {
+  const variants = [panel];
+
+  if (panel.width !== panel.height) {
+    variants.push(rotatePanelGeometry(panel));
+  }
+
+  return variants;
+}
+
+function rotatePanelGeometry(panel: PositionedPanelGeometry): PositionedPanelGeometry {
+  return {
+    ...panel,
+    width: panel.height,
+    height: panel.width,
+    rotated: !panel.rotated,
+    cutPaths: panel.cutPaths.map((path) => ({
+      points: path.points.map((point) => ({
+        x: panel.height - point.y,
+        y: point.x,
+      })),
+    })),
+  };
 }
 
 function renderLegend(panels: PreviewPanelPlacement[], legendX: number): string {
@@ -235,7 +632,7 @@ function renderLegend(panels: PreviewPanelPlacement[], legendX: number): string 
     const itemY = itemStartY + (index * itemGap);
     const badgeX = legendX + 8;
     const name = `${formatLegendPanelName(panel.name)} ×${panel.quantity}`;
-    const dims = `${formatDisplayNumber(panel.width)} × ${formatDisplayNumber(panel.height)} mm`;
+    const dims = `${formatDisplayNumber(panel.originalWidth)} × ${formatDisplayNumber(panel.originalHeight)} mm`;
     const note = truncateText(panel.note, 34);
 
     return [
@@ -254,6 +651,45 @@ function renderLegend(panels: PreviewPanelPlacement[], legendX: number): string 
     items,
     `</g>`,
   ].join("\n");
+}
+
+function renderAssemblyPlan(
+  project: Box50Project,
+  panels: PreviewPanelPlacement[],
+  legendX: number,
+  startY: number,
+): SidebarSectionMarkup {
+  const steps = buildAssemblySteps(project, panels);
+  const stepBadgeX = legendX + 8;
+  const textColumnX = legendX + 20;
+  let currentY = startY + 20;
+
+  const items = steps.map((step, index) => {
+    const lines = wrapText(step, 34, 3);
+    const badgeY = currentY;
+    const markup = [
+      `<circle cx="${stepBadgeX}" cy="${badgeY}" r="${MARKER_RADIUS}" class="marker-badge" />`,
+      `<text x="${stepBadgeX}" y="${badgeY}" class="marker-text">${index + 1}</text>`,
+      ...lines.map((line, lineIndex) => `<text x="${textColumnX}" y="${currentY - 2 + (lineIndex * 5)}" class="legend-item">${escapeXml(line)}</text>`),
+    ].join("\n");
+
+    currentY += (lines.length * 5) + 8;
+    return markup;
+  }).join("\n");
+
+  const bottom = currentY + 2;
+  const height = bottom - startY;
+
+  return {
+    markup: [
+      `<g>`,
+      `<rect x="${legendX}" y="${startY}" width="${LEGEND_WIDTH}" height="${height}" rx="3" class="legend-box" />`,
+      `<text x="${textColumnX}" y="${startY + 9}" class="legend-title">Assembly Plan</text>`,
+      items,
+      `</g>`,
+    ].join("\n"),
+    bottom,
+  };
 }
 
 function renderLegendBottom(panels: PreviewPanelPlacement[]): number {
@@ -372,4 +808,74 @@ function humanizeIdentifier(value: string): string {
       ? segment
       : `${segment[0]?.toUpperCase() ?? ""}${segment.slice(1)}`)
     .join(" ");
+}
+
+function buildAssemblySteps(project: Box50Project, panels: PreviewPanelPlacement[]): string[] {
+  const layoutSeparators = new Map((project.config.typeALayout?.separators ?? []).map((separator) => [separator.id, separator]));
+  const bottomRefs = collectPreviewNumbers(panels, (panel) => panel.name === "bottom");
+  const wallRefs = collectPreviewNumbers(panels, (panel) => panel.name === "front-back" || panel.name === "left-right");
+  const primarySeparatorRefs = collectPreviewNumbers(panels, (panel) => {
+    if (!panel.name.startsWith("separator:")) {
+      return false;
+    }
+
+    const separatorId = panel.name.slice("separator:".length);
+    return layoutSeparators.get(separatorId)?.role === "primary";
+  });
+  const secondarySeparatorRefs = collectPreviewNumbers(panels, (panel) => {
+    if (!panel.name.startsWith("separator:")) {
+      return false;
+    }
+
+    const separatorId = panel.name.slice("separator:".length);
+    return layoutSeparators.get(separatorId)?.role === "secondary";
+  });
+  const lidRefs = collectPreviewNumbers(panels, (panel) => panel.name === "lid");
+
+  const steps: string[] = [];
+
+  if (bottomRefs.length > 0) {
+    steps.push(`Lay ${formatPreviewReferences(bottomRefs)} flat on the bench as the base.`);
+  }
+
+  if (wallRefs.length > 0) {
+    steps.push(`Fit ${formatPreviewReferences(wallRefs)} into the bottom slots and keep the shell square.`);
+  }
+
+  if (primarySeparatorRefs.length > 0) {
+    steps.push(`Insert ${formatPreviewReferences(primarySeparatorRefs)} into the bottom mortises first.`);
+  }
+
+  if (secondarySeparatorRefs.length > 0) {
+    steps.push(`Lock ${formatPreviewReferences(secondarySeparatorRefs)} into the primaries and side walls.`);
+  }
+
+  if (lidRefs.length > 0) {
+    steps.push(`Check the rail path, then slide ${formatPreviewReferences(lidRefs)} into place.`);
+  }
+
+  steps.push("Do a full dry-fit before glue, screws, or final clamping.");
+  return steps;
+}
+
+function collectPreviewNumbers(
+  panels: PreviewPanelPlacement[],
+  predicate: (panel: PreviewPanelPlacement) => boolean,
+): number[] {
+  return panels
+    .filter(predicate)
+    .map((panel) => panel.previewNumber)
+    .sort((left, right) => left - right);
+}
+
+function formatPreviewReferences(numbers: number[]): string {
+  if (numbers.length === 0) {
+    return "the matching parts";
+  }
+
+  if (numbers.length === 1) {
+    return `part ${numbers[0]}`;
+  }
+
+  return `parts ${numbers.join(", ")}`;
 }

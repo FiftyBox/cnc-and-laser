@@ -83,6 +83,12 @@ Currently implemented in cut mode:
 - wall-lock mortises for separators that reach a box wall
 - automatic geometry validation during project generation
 
+Current Type A layout validation includes:
+- minimum separator span length
+- minimum spacing between parallel separator axes
+- reciprocal declaration of separator joints
+- minimum spacing between multiple secondary joints on one primary
+
 Still missing:
 - configurable wall-lock profiles beyond the current rectangular mortise convention
 - additional topology validation beyond the current orthogonal/self-intersection checks

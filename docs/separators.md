@@ -27,6 +27,11 @@ Normative rules for the first programmable Type A layout phase:
 - Secondary separators receive the corresponding edge tenons.
 - In V1, a secondary separator must meet its primary separator at its start edge or end edge.
 - When a separator reaches a box wall, the corresponding wall-lock mortise is generated in that wall panel.
+- Every separator span must be at least 30 mm.
+- Parallel separator axes must remain at least 18 mm apart.
+- A declared separator-to-separator joint must be present on both participating separators.
+- A secondary separator without any separator joint must reach both walls in its axis.
+- Multiple secondary joints on the same primary separator must remain at least 24 mm apart.
 
 ## Type B (fixed)
 - Finger‑jointed

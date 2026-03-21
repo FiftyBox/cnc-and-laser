@@ -1,0 +1,20 @@
+{
+  "id": "bento-2-100x200x100",
+  "kind": "type-a-layout",
+  "referenceFrame": "internal",
+  "separators": [
+    {
+      "id": "main-vertical",
+      "orientation": "vertical",
+      "role": "primary",
+      "position": 47,
+      "spanStart": 0,
+      "spanEnd": 194,
+      "bottomJoint": {
+        "enabled": true,
+        "tenonDepth": 2.9,
+        "tenonHeight": 3.5
+      }
+    }
+  ]
+}

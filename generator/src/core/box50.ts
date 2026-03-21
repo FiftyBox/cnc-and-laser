@@ -15,6 +15,9 @@ const TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH = 4.5;
 const TYPE_A_SEPARATOR_BOTTOM_ANCHOR_INSET = 12;
 const TYPE_A_SEPARATOR_MIN_PRIMARY_END_MARGIN = 8;
 const TYPE_A_SEPARATOR_SIDE_LOCK_GAP = 2;
+const TYPE_A_SEPARATOR_MIN_SPAN_LENGTH = 30;
+const TYPE_A_SEPARATOR_MIN_AXIS_GAP = 18;
+const TYPE_A_PRIMARY_MIN_JOINT_SPACING = 24;
 
 interface ResolvedTypeASeparator {
   definition: TypeASeparatorDefinition;
@@ -232,8 +235,9 @@ export function buildTypeAPanelGeometries(
     const resolvedSeparator = separatorLookup.get(panel.name);
 
     if (resolvedSeparator !== undefined) {
+      const startEdgeDepth = resolvedSeparator.edgeTenons.find((edgeTenon) => edgeTenon.edge === "start")?.depth ?? 0;
       const mortiseCutPaths = resolvedSeparator.mortisePositions.map((position) => createOffsetRectanglePath(
-        TYPE_A_SEPARATOR_TENON_DEPTH + position - (TYPE_A_SEPARATOR_MORTISE_WIDTH / 2),
+        startEdgeDepth + position - (TYPE_A_SEPARATOR_MORTISE_WIDTH / 2),
         resolvedSeparator.panelHeight - config.materialThickness - config.materialThickness - TYPE_A_SEPARATOR_MORTISE_HEIGHT,
         TYPE_A_SEPARATOR_MORTISE_WIDTH,
         TYPE_A_SEPARATOR_MORTISE_HEIGHT,
@@ -241,12 +245,18 @@ export function buildTypeAPanelGeometries(
 
       return createTypeADividerPanelGeometry({
         ...panel,
-        width: resolvedSeparator.panelWidth,
+        width: resolvedSeparator.spanLength,
         height: resolvedSeparator.panelHeight,
         tenonDepth: resolvedSeparator.definition.bottomJoint.tenonDepth,
         tenonHeight: resolvedSeparator.definition.bottomJoint.tenonHeight,
         tenonBottomOffset: config.materialThickness,
         ...(resolvedSeparator.edgeTenons.length === 0 ? {} : { edgeTenons: resolvedSeparator.edgeTenons }),
+        ...(resolvedSeparator.bottomAnchorCenters.length === 0
+          ? {}
+          : {
+            bottomTenonCenters: resolvedSeparator.bottomAnchorCenters,
+            bottomTenonLength: TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH,
+          }),
         ...(mortiseCutPaths.length === 0 ? {} : { mortiseCutPaths }),
       });
     }
@@ -300,6 +310,8 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
     validateTypeASeparatorDefinition(separator, dimensions);
   }
 
+  validateTypeALayoutBusinessRules(layout.separators);
+
   const mortisePositionsById = new Map<string, number[]>();
   const edgeTenonsById = new Map<string, ResolvedTypeASeparator["edgeTenons"]>();
   const seenPairs = new Set<string>();
@@ -310,6 +322,10 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
 
       if (target === undefined) {
         throw new Error(`Type A layout separator ${separator.id} references unknown separator ${joint.with}.`);
+      }
+
+      if (!hasReciprocalJoint(target, separator.id)) {
+        throw new Error(`Type A layout joint ${separator.id} -> ${target.id} must be declared on both separators.`);
       }
 
       const pairKey = [separator.id, target.id].sort().join("::");
@@ -362,6 +378,8 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
     }
   }
 
+  validateSecondaryConnectivity(layout.separators, dimensions);
+
   const separators = layout.separators.map((separator) => {
     const spanLength = getSeparatorSpanLength(separator);
     const wallLockEdges = resolveWallLockEdges(separator, dimensions);
@@ -375,19 +393,25 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
       });
     }
 
+    const edgeTenons = edgeTenonsById.get(separator.id) ?? [];
+    const startEdgeDepth = edgeTenons.find((edgeTenon) => edgeTenon.edge === "start")?.depth ?? 0;
+    const endEdgeDepth = edgeTenons.find((edgeTenon) => edgeTenon.edge === "end")?.depth ?? 0;
+
     return {
       definition: separator,
       panelName: `separator:${separator.id}`,
       spanLength,
-      panelWidth: spanLength + (2 * separator.bottomJoint.tenonDepth),
+      panelWidth: spanLength + startEdgeDepth + endEdgeDepth,
       panelHeight: dimensions.internalHeight - config.dividerClearance,
       bottomAnchorCenters: separator.bottomJoint.enabled
         ? resolveBottomAnchorCenters(spanLength)
         : [],
       mortisePositions: mortisePositionsById.get(separator.id) ?? [],
-      edgeTenons: edgeTenonsById.get(separator.id) ?? [],
+      edgeTenons,
     } satisfies ResolvedTypeASeparator;
   });
+
+  validatePrimaryJointSpacing(separatorsById, mortisePositionsById);
 
   return {
     layout,
@@ -416,6 +440,10 @@ function validateTypeASeparatorDefinition(separator: TypeASeparatorDefinition, d
 
   if (separator.spanStart < 0 || separator.spanEnd > maxSpan) {
     throw new Error(`Type A layout separator ${separator.id} span must stay within the internal volume.`);
+  }
+
+  if (getSeparatorSpanLength(separator) < TYPE_A_SEPARATOR_MIN_SPAN_LENGTH) {
+    throw new Error(`Type A layout separator ${separator.id} span must be at least ${TYPE_A_SEPARATOR_MIN_SPAN_LENGTH} mm.`);
   }
 
   if (separator.role === "primary") {
@@ -565,4 +593,98 @@ function buildTypeASeparatorNote(separator: TypeASeparatorDefinition): string {
 
 function approxEqual(left: number, right: number, tolerance = 0.05): boolean {
   return Math.abs(left - right) <= tolerance;
+}
+
+function validateTypeALayoutBusinessRules(separators: TypeASeparatorDefinition[]): void {
+  for (let leftIndex = 0; leftIndex < separators.length; leftIndex += 1) {
+    const left = separators[leftIndex];
+
+    if (left === undefined) {
+      continue;
+    }
+
+    for (let rightIndex = leftIndex + 1; rightIndex < separators.length; rightIndex += 1) {
+      const right = separators[rightIndex];
+
+      if (right === undefined || left.orientation !== right.orientation) {
+        continue;
+      }
+
+      const axisGap = Math.abs(left.position - right.position);
+
+      if (axisGap < TYPE_A_SEPARATOR_MIN_AXIS_GAP) {
+        throw new Error(`Type A layout separators ${left.id} and ${right.id} are too close on parallel axes; keep at least ${TYPE_A_SEPARATOR_MIN_AXIS_GAP} mm between them.`);
+      }
+
+      if (approxEqual(axisGap, 0) && spansOverlap(left.spanStart, left.spanEnd, right.spanStart, right.spanEnd)) {
+        throw new Error(`Type A layout separators ${left.id} and ${right.id} cannot overlap on the same axis.`);
+      }
+    }
+
+  }
+}
+
+function validatePrimaryJointSpacing(
+  separatorsById: Map<string, TypeASeparatorDefinition>,
+  mortisePositionsById: Map<string, number[]>,
+): void {
+  for (const [separatorId, positions] of mortisePositionsById.entries()) {
+    const separator = separatorsById.get(separatorId);
+
+    if (separator === undefined || positions.length < 2) {
+      continue;
+    }
+
+    const sortedPositions = [...positions].sort((left, right) => left - right);
+
+    for (let index = 1; index < sortedPositions.length; index += 1) {
+      const previous = sortedPositions[index - 1];
+      const current = sortedPositions[index];
+
+      if (previous === undefined || current === undefined) {
+        continue;
+      }
+
+      if ((current - previous) < TYPE_A_PRIMARY_MIN_JOINT_SPACING) {
+        throw new Error(`Type A primary separator ${separator.id} must keep at least ${TYPE_A_PRIMARY_MIN_JOINT_SPACING} mm between secondary joints.`);
+      }
+    }
+  }
+}
+
+function hasReciprocalJoint(separator: TypeASeparatorDefinition, targetId: string): boolean {
+  return (separator.crossJoints ?? []).some((joint) => joint.with === targetId);
+}
+
+function resolveWallCount(separator: TypeASeparatorDefinition, dimensions: Box50Dimensions): number {
+  const maxSpan = separator.orientation === "vertical"
+    ? dimensions.internalDepth
+    : dimensions.internalWidth;
+  let count = 0;
+
+  if (approxEqual(separator.spanStart, 0)) {
+    count += 1;
+  }
+
+  if (approxEqual(separator.spanEnd, maxSpan)) {
+    count += 1;
+  }
+
+  return count;
+}
+
+function spansOverlap(leftStart: number, leftEnd: number, rightStart: number, rightEnd: number): boolean {
+  return Math.max(leftStart, rightStart) < Math.min(leftEnd, rightEnd);
+}
+
+function validateSecondaryConnectivity(separators: TypeASeparatorDefinition[], dimensions: Box50Dimensions): void {
+  for (const separator of separators) {
+    if (separator.role !== "secondary") {
+      continue;
+    }
+
+    if ((separator.crossJoints?.length ?? 0) === 0 && resolveWallCount(separator, dimensions) < 2) {
+      throw new Error(`Type A secondary separator ${separator.id} must either connect to another separator or reach both walls.`);
+    }
+  }
 }

@@ -52,4 +52,11 @@ Current reference example:
 
 - examples/bento-3-right-split-150x200x100/
 
+Additional reference examples:
+
+- examples/bento-2-100x200x100/
+- examples/bento-3-left-split-150x200x100/
+- examples/l-simple-150x200x100/
+- examples/bento-5-left-3-right-2-150x200x100/
+
 Each folder should describe the box dimensions, internal dimensions, material assumptions, and any generation parameters.

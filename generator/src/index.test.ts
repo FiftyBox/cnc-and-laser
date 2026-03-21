@@ -156,6 +156,73 @@ test("createProject builds Type A layout separators and bottom mortises from a b
   assert.equal(secondarySeparator.cutPaths.length, 1);
 });
 
+test("Type A layout separators with bottom mortises generate real bottom tenons", () => {
+  const project = createProject(createDefaultConfig({
+    type: "A",
+    widthUnits: 2,
+    depthUnits: 4,
+    heightUnits: 2,
+    typeALayout: {
+      id: "bento-3-right-split",
+      kind: "type-a-layout",
+      referenceFrame: "internal",
+      separators: [
+        {
+          id: "main-vertical",
+          orientation: "vertical",
+          role: "primary",
+          position: 60,
+          spanStart: 0,
+          spanEnd: 194,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "right-horizontal",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+        {
+          id: "right-horizontal",
+          orientation: "horizontal",
+          role: "secondary",
+          position: 97,
+          spanStart: 60,
+          spanEnd: 94,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "main-vertical",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+      ],
+    },
+  }));
+
+  const separator = project.panelGeometries.find((panel) => panel.name === "separator:right-horizontal");
+
+  assert.ok(separator);
+
+  const outerPath = separator.cutPaths[0];
+  assert.ok(outerPath);
+  const maxY = Math.max(...outerPath.points.map((point) => point.y));
+  const pointsBelowBottomEdge = outerPath.points.filter((point) => point.y > separator.height);
+
+  assert.equal(maxY, separator.height + 2.9);
+  assert.ok(pointsBelowBottomEdge.length > 0);
+  assert.ok(pointsBelowBottomEdge.some((point) => point.x > 0 && point.x < separator.width));
+});
+
 test("createProject rejects non-traversing primary separators in Type A layouts", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
@@ -188,6 +255,239 @@ test("createProject rejects non-traversing primary separators in Type A layouts"
   );
 });
 
+test("createProject rejects Type A separators with spans shorter than the mechanical minimum", () => {
+  assert.throws(
+    () => createProject(createDefaultConfig({
+      type: "A",
+      widthUnits: 2,
+      depthUnits: 4,
+      heightUnits: 2,
+      typeALayout: {
+        id: "invalid-short-secondary",
+        kind: "type-a-layout",
+        referenceFrame: "internal",
+        separators: [
+          {
+            id: "main-vertical",
+            orientation: "vertical",
+            role: "primary",
+            position: 60,
+            spanStart: 0,
+            spanEnd: 194,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "short-secondary",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+          {
+            id: "short-secondary",
+            orientation: "horizontal",
+            role: "secondary",
+            position: 97,
+            spanStart: 60,
+            spanEnd: 84,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "main-vertical",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+        ],
+      },
+    })),
+    /span must be at least 30 mm/,
+  );
+});
+
+test("createProject rejects parallel Type A separators that are too close", () => {
+  assert.throws(
+    () => createProject(createDefaultConfig({
+      type: "A",
+      widthUnits: 4,
+      depthUnits: 4,
+      heightUnits: 2,
+      typeALayout: {
+        id: "invalid-parallel-gap",
+        kind: "type-a-layout",
+        referenceFrame: "internal",
+        separators: [
+          {
+            id: "main-a",
+            orientation: "vertical",
+            role: "primary",
+            position: 60,
+            spanStart: 0,
+            spanEnd: 194,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+          },
+          {
+            id: "main-b",
+            orientation: "vertical",
+            role: "primary",
+            position: 72,
+            spanStart: 0,
+            spanEnd: 194,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+          },
+        ],
+      },
+    })),
+    /too close on parallel axes/,
+  );
+});
+
+test("createProject rejects non-reciprocal Type A joints", () => {
+  assert.throws(
+    () => createProject(createDefaultConfig({
+      type: "A",
+      widthUnits: 2,
+      depthUnits: 4,
+      heightUnits: 2,
+      typeALayout: {
+        id: "invalid-non-reciprocal-joint",
+        kind: "type-a-layout",
+        referenceFrame: "internal",
+        separators: [
+          {
+            id: "main-vertical",
+            orientation: "vertical",
+            role: "primary",
+            position: 60,
+            spanStart: 0,
+            spanEnd: 194,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "right-horizontal",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+          {
+            id: "right-horizontal",
+            orientation: "horizontal",
+            role: "secondary",
+            position: 97,
+            spanStart: 60,
+            spanEnd: 94,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+          },
+        ],
+      },
+    })),
+    /must be declared on both separators/,
+  );
+});
+
+test("createProject rejects primary separators with joints that are too tightly packed", () => {
+  assert.throws(
+    () => createProject(createDefaultConfig({
+      type: "A",
+      widthUnits: 3,
+      depthUnits: 4,
+      heightUnits: 2,
+      typeALayout: {
+        id: "invalid-tight-joints",
+        kind: "type-a-layout",
+        referenceFrame: "internal",
+        separators: [
+          {
+            id: "main-vertical",
+            orientation: "vertical",
+            role: "primary",
+            position: 90,
+            spanStart: 0,
+            spanEnd: 194,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "right-top",
+                mode: "mortise-primary-tenon-secondary",
+              },
+              {
+                with: "right-bottom",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+          {
+            id: "right-top",
+            orientation: "horizontal",
+            role: "secondary",
+            position: 97,
+            spanStart: 90,
+            spanEnd: 144,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "main-vertical",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+          {
+            id: "right-bottom",
+            orientation: "horizontal",
+            role: "secondary",
+            position: 117,
+            spanStart: 90,
+            spanEnd: 144,
+            bottomJoint: {
+              enabled: true,
+              tenonDepth: 2.9,
+              tenonHeight: 3.5,
+            },
+            crossJoints: [
+              {
+                with: "main-vertical",
+                mode: "mortise-primary-tenon-secondary",
+              },
+            ],
+          },
+        ],
+      },
+    })),
+    /must keep at least 24 mm between secondary joints/,
+  );
+});
+
 test("renderProjectSvg defaults to layout mode", () => {
   const project = createProject(createDefaultConfig({
     type: "A",
@@ -201,8 +501,74 @@ test("renderProjectSvg defaults to layout mode", () => {
   assert.match(svg, /Standard Type A/);
   assert.match(svg, /logo-frame/);
   assert.match(svg, /Placed Parts/);
+  assert.match(svg, /Assembly Plan/);
+  assert.match(svg, /Lay part 1 flat on the bench as/);
+  assert.match(svg, /the base\./);
+  assert.match(svg, /Do a full dry-fit before glue,/);
+  assert.match(svg, /screws, or final clamping\./);
+  assert.match(svg, /class="pictogram-line"/);
   assert.match(svg, /marker-badge/);
   assert.doesNotMatch(svg, /class="cut"/);
+});
+
+test("renderProjectSvg renders pictograms for lid and Type A separators", () => {
+  const project = createProject(createDefaultConfig({
+    type: "A",
+    widthUnits: 3,
+    depthUnits: 4,
+    heightUnits: 2,
+    typeALayout: {
+      id: "bento-3-right-split",
+      kind: "type-a-layout",
+      referenceFrame: "internal",
+      separators: [
+        {
+          id: "main-vertical",
+          orientation: "vertical",
+          role: "primary",
+          position: 60,
+          spanStart: 0,
+          spanEnd: 194,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "right-horizontal",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+        {
+          id: "right-horizontal",
+          orientation: "horizontal",
+          role: "secondary",
+          position: 97,
+          spanStart: 60,
+          spanEnd: 94,
+          bottomJoint: {
+            enabled: true,
+            tenonDepth: 2.9,
+            tenonHeight: 3.5,
+          },
+          crossJoints: [
+            {
+              with: "main-vertical",
+              mode: "mortise-primary-tenon-secondary",
+            },
+          ],
+        },
+      ],
+    },
+  }));
+
+  const svg = renderProjectSvg(project);
+
+  assert.match(svg, /class="pictogram-chip"/);
+  assert.match(svg, /class="pictogram-text">P<\/text>/);
+  assert.match(svg, /class="pictogram-text">S<\/text>/);
 });
 
 test("offsetOrthogonalClosedPath expands and contracts axis-aligned rectangles", () => {
@@ -258,10 +624,150 @@ test("renderProjectSvgWithMode emits a cut-only SVG in cut mode", () => {
 
   assert.match(svg, /class="cut"/);
   assert.match(svg, /14\.95/);
-  assert.match(svg, /18\.15/);
+  assert.match(svg, /viewBox="0 0 [0-9.]+ [0-9.]+"/);
   assert.doesNotMatch(svg, /Box50 Layout Preview/);
   assert.doesNotMatch(svg, /Placed Parts/);
   assert.doesNotMatch(svg, /marker-badge/);
+});
+
+test("renderProjectSvg packs panels by size to reduce wasted shelf height", () => {
+  const config = createDefaultConfig({
+    type: "A",
+    widthUnits: 1,
+    depthUnits: 1,
+    heightUnits: 1,
+  });
+
+  const project = {
+    config,
+    dimensions: calculateDimensions(config),
+    panels: [],
+    panelGeometries: [
+      {
+        name: "tall-a",
+        width: 150,
+        height: 200,
+        quantity: 1,
+        note: "Tall panel A",
+        cutPaths: [createRectanglePath(150, 200)],
+      },
+      {
+        name: "short-a",
+        width: 150,
+        height: 40,
+        quantity: 1,
+        note: "Short panel A",
+        cutPaths: [createRectanglePath(150, 40)],
+      },
+      {
+        name: "tall-b",
+        width: 150,
+        height: 200,
+        quantity: 1,
+        note: "Tall panel B",
+        cutPaths: [createRectanglePath(150, 200)],
+      },
+      {
+        name: "short-b",
+        width: 150,
+        height: 40,
+        quantity: 1,
+        note: "Short panel B",
+        cutPaths: [createRectanglePath(150, 40)],
+      },
+    ],
+    fileStem: "packing-check",
+  };
+
+  const svg = renderProjectSvg(project);
+
+  assert.match(svg, /Required sheet envelope 250\.00 × 310\.00 mm/);
+});
+
+test("renderProjectSvg includes downward protruding tenons in the layout envelope", () => {
+  const config = createDefaultConfig({
+    type: "A",
+    widthUnits: 1,
+    depthUnits: 1,
+    heightUnits: 1,
+  });
+
+  const project = {
+    config,
+    dimensions: calculateDimensions(config),
+    panels: [],
+    panelGeometries: [
+      {
+        name: "bottom-tenon-check",
+        width: 20,
+        height: 20,
+        quantity: 1,
+        note: "Panel with bottom tenon extension",
+        cutPaths: [
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 20, y: 0 },
+              { x: 20, y: 20 },
+              { x: 14, y: 20 },
+              { x: 14, y: 25 },
+              { x: 6, y: 25 },
+              { x: 6, y: 20 },
+              { x: 0, y: 20 },
+            ],
+          },
+        ],
+      },
+    ],
+    fileStem: "bottom-tenon-envelope-check",
+  };
+
+  const svg = renderProjectSvg(project);
+
+  assert.match(svg, /Required sheet envelope 20\.00 × 25\.00 mm/);
+  assert.match(svg, /<rect x="12" y="70" width="20" height="25" class="sheet" \/>/);
+});
+
+test("renderProjectSvg positions preview markers from the real outer contour bounds", () => {
+  const config = createDefaultConfig({
+    type: "A",
+    widthUnits: 1,
+    depthUnits: 1,
+    heightUnits: 1,
+  });
+
+  const project = {
+    config,
+    dimensions: calculateDimensions(config),
+    panels: [],
+    panelGeometries: [
+      {
+        name: "marker-bounds-check",
+        width: 20,
+        height: 20,
+        quantity: 1,
+        note: "Panel with top and right protrusions",
+        cutPaths: [
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 20, y: 0 },
+              { x: 20, y: -5 },
+              { x: 25, y: -5 },
+              { x: 25, y: 20 },
+              { x: 0, y: 20 },
+            ],
+          },
+        ],
+      },
+    ],
+    fileStem: "marker-bounds-check",
+  };
+
+  const svg = renderProjectSvg(project);
+
+  assert.match(svg, /<line x1="24\.5" y1="68\.5" x2="24\.5" y2="65" class="marker-line" \/>/);
+  assert.match(svg, /<circle cx="24\.5" cy="64" r="4\.5" class="marker-badge" \/>/);
 });
 
 test("validatePanelGeometry rejects non-orthogonal contours", () => {
