@@ -56,10 +56,10 @@ test("resolveConfigFromCliArgs loads a Standard layout from JSON", async () => {
   }
 });
 
-test("resolveConfigFromCliArgs rejects layout JSON with Template", async () => {
+test("resolveConfigFromCliArgs rejects layout JSON with Preset", async () => {
   await assert.rejects(
     () => resolveConfigFromCliArgs(parseArgs([
-      "--type", "template",
+      "--type", "preset",
       "--w", "2",
       "--d", "2",
       "--h", "1",

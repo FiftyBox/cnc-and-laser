@@ -5,7 +5,7 @@
 - Removable dividers
 - Reconfigurable
 
-## Template
+## Preset
 - No generic mortises
 - Fixed layout
 - Optimized for one game

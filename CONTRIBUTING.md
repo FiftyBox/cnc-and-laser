@@ -7,7 +7,7 @@
 
 ## Adding a pre-generated box
 - Place Standard files in library/standard/<L>x<P>x<H>/
-- Place Template files in library/templates/<publisher>/<game>/
+- Place Preset files in library/presets/<publisher>/<game>/
 - Include:
   - SVG or DXF files
   - Markdown description
@@ -16,8 +16,8 @@
 ## Naming
 box50-<L>x<P>x<H>-standard-layout.svg
 box50-<L>x<P>x<H>-standard-cut.svg
-box50-<L>x<P>x<H>-template-layout.svg
-box50-<L>x<P>x<H>-template-cut.svg
+box50-<L>x<P>x<H>-preset-layout.svg
+box50-<L>x<P>x<H>-preset-cut.svg
 
 ## Requirements
 - Must follow /docs/specification.md

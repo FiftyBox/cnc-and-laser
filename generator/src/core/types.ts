@@ -1,4 +1,4 @@
-export type BoxProfile = "standard" | "template";
+export type BoxProfile = "standard" | "preset";
 
 export type SeparatorOrientation = "vertical" | "horizontal";
 export type SeparatorRole = "primary" | "secondary";

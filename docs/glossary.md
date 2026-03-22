@@ -6,5 +6,5 @@ Tenon: Protrusion inserted into a mortise.
 Kerf: Thickness of material burned/cut.
 Rail: Groove for sliding lid.
 Standard: Configurable standard box.
-Template: Finalized game-specific template.
+Preset: Finalized game-specific preset.
 Module: Box50 container unit.

@@ -4,7 +4,7 @@ This folder contains the first TypeScript implementation of the Box50 generator.
 
 Current scope:
 - Box50 dimension calculations
-- Standard / Template parameter handling
+- Standard / Preset parameter handling
 - SVG layout export for sheet estimation
 - SVG cut export foundation
 - CLI generation from terminal arguments
@@ -50,7 +50,7 @@ node dist/cli.js --type standard --w 2 --d 4 --h 2 --mode cut --out output/box50
 Custom output path:
 
 ```bash
-npm run generate -- --type template --w 2 --d 2 --h 1 --mode layout --out output/box50-100x100x50-template-layout.svg
+npm run generate -- --type preset --w 2 --d 2 --h 1 --mode layout --out output/box50-100x100x50-preset-layout.svg
 ```
 
 Generate from a Standard layout JSON file:
@@ -78,7 +78,7 @@ Currently implemented in cut mode:
 - Standard wall-to-bottom joints on the lower wall edges
 - Standard bottom panel with matching tenon edges
 - Standard side-panel rail profile as a stepped loading-pocket cut
-- default removable Standard divider template with side tenons when no explicit layout is provided
+- default removable Standard divider with side tenons when no explicit layout is provided
 - programmatic Standard layouts with traversing primary separators, partial secondary separators, bottom mortises, primary mortises, and secondary edge tenons
 - wall-lock mortises for separators that reach a box wall
 - automatic geometry validation during project generation

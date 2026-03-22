@@ -36,7 +36,7 @@ Lid:
 - Optional bottom grooves
 - Removable dividers
 
-### Template
+### Preset
 - No generic mortises
 - Fixed dividers only
 
@@ -46,7 +46,7 @@ Lid:
 - Mortises 3.1 mm
 - 25 mm spacing
 
-### Template fixed
+### Preset fixed
 - Finger-jointed mini-panels
 
 ## 8. Modules
@@ -118,15 +118,15 @@ The following rules define the first production-oriented geometry model for Stan
 - This mortise-grid convention is normative for the first Standard removable-divider implementation.
 
 ### 10.9 First Removable Divider Convention
-- The first production SVG implementation includes one removable divider template for Standard.
-- The divider template spans the internal depth of the box.
+- The first production SVG implementation includes one default removable divider for Standard.
+- The divider spans the internal depth of the box.
 - Divider body height is Hint − divider clearance.
 - Divider side tenons are rectangular.
 - Tenon depth is 2.9 mm.
 - Tenon height is 3.5 mm.
-- Tenon bottom edge is positioned 3 mm above the bottom edge of the divider template.
+- Tenon bottom edge is positioned 3 mm above the bottom edge of the divider.
 - Divider tenons are placed on the left and right edges only in this phase.
-- This divider template is the normative first removable-divider geometry for Standard production SVG output.
+- This divider is the normative first removable-divider geometry for Standard production SVG output.
 
 ### 10.8 Sliding Lid Convention
 - Rail nominal width is 3.1 mm.

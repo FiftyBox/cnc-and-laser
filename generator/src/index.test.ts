@@ -62,7 +62,7 @@ test("createProject builds expected Standard panel set with internal cuts", () =
   const bottom = project.panelGeometries.find((panel) => panel.name === "bottom");
   const frontBack = project.panelGeometries.find((panel) => panel.name === "front-back");
   const leftRight = project.panelGeometries.find((panel) => panel.name === "left-right");
-  const divider = project.panelGeometries.find((panel) => panel.name === "divider-depth-template");
+  const divider = project.panelGeometries.find((panel) => panel.name === "divider-depth-default");
 
   assert.ok(bottom);
   assert.ok(frontBack);
@@ -140,7 +140,7 @@ test("createProject builds Standard layout separators and bottom mortises from a
   const leftRight = project.panelGeometries.find((panel) => panel.name === "left-right");
   const primarySeparator = project.panelGeometries.find((panel) => panel.name === "separator:main-vertical");
   const secondarySeparator = project.panelGeometries.find((panel) => panel.name === "separator:right-horizontal");
-  const legacyDivider = project.panelGeometries.find((panel) => panel.name === "divider-depth-template");
+  const legacyDivider = project.panelGeometries.find((panel) => panel.name === "divider-depth-default");
 
   assert.ok(bottom);
   assert.ok(frontBack);

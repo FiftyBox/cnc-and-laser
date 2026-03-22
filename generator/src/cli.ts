@@ -8,7 +8,7 @@ import type { Box50Config, StandardLayoutDefinition } from "./index.js";
 type CliRenderMode = "layout" | "cut";
 
 interface CliArgs {
-  type: "standard" | "template";
+  type: "standard" | "preset";
   widthUnits: number;
   depthUnits: number;
   heightUnits: number;
@@ -51,8 +51,8 @@ function parseArgs(argv: string[]): CliArgs {
   const outputPath = readOptionalOption(argv, "--out");
   const layoutJsonPath = readOptionalOption(argv, "--layout-json");
 
-  if (type !== "standard" && type !== "template") {
-    throw new Error("--type must be standard or template.");
+  if (type !== "standard" && type !== "preset") {
+    throw new Error("--type must be standard or preset.");
   }
 
   const cliArgs: CliArgs = {
@@ -146,7 +146,7 @@ function printHelp(): void {
     "Box50 generator",
     "",
     "Required:",
-    "  --type standard|template",
+    "  --type standard|preset",
     "                  Output family",
     "  --w <int>       Width in 50 mm units",
     "  --d <int>       Depth in 50 mm units",

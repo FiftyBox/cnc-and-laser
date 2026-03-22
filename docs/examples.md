@@ -46,7 +46,7 @@ First Standard mortise-grid convention for this validation case:
 - mortise bottom edge: 6 mm above the bottom outer edge
 
 First removable divider convention for this validation case:
-- one divider template spanning the internal depth
+- one default divider spanning the internal depth
 - divider body height: 90.25 mm
 - left and right side tenons only
 - tenon depth: 2.9 mm

@@ -100,7 +100,7 @@ export function buildPanels(dimensions: Box50Dimensions, config: Box50Config): P
 function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config, resolvedLayout?: ResolvedStandardLayout): PanelDefinition[] {
   const typeLabel = config.type === "standard"
     ? `Standard configurable layout, divider clearance ${formatMillimeters(config.dividerClearance)}`
-    : "Finalized template geometry, engraving and game-specific features allowed";
+    : "Finalized preset geometry, engraving and game-specific features allowed";
   const panels: PanelDefinition[] = [
     {
       name: "bottom",
@@ -143,11 +143,11 @@ function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config,
       })));
     } else {
       panels.push({
-        name: "divider-depth-template",
+        name: "divider-depth-default",
         width: dimensions.internalDepth + 5.8,
         height: dimensions.internalHeight - config.dividerClearance,
         quantity: 1,
-        note: "Default divider template spanning internal depth",
+        note: "Default removable Standard divider spanning internal depth",
       });
     }
   }
@@ -221,7 +221,7 @@ export function buildStandardPanelGeometries(
       });
     }
 
-    if (panel.name === "divider-depth-template") {
+    if (panel.name === "divider-depth-default") {
       return createStandardDividerPanelGeometry({
         ...panel,
         width: dimensions.internalDepth + 5.8,

@@ -6,7 +6,7 @@ The system is:
 - Modular (external dimensions are 50 mm multiples)
 - Maker-friendly (laser/CNC compatible)
 - Flexible (standard configurable layouts)
-- Ready for finalized game templates and engraved variants
+- Ready for finalized game presets and engraved variants
 - Secure (sliding-lid system)
 
 See the docs/ directory for full details.
@@ -15,7 +15,7 @@ See the docs/ directory for full details.
 - 50 mm grid external sizes (width, depth, height)
 - Rectangular finger-joint assembly
 - Sliding-lid system with dual rails
-- Configurable standard layouts or finalized game templates
+- Configurable standard layouts or finalized game presets
 - Modular inserts (cards, tokens, dice…)
 - Fully documented formulas
 - Generator-ready architecture
@@ -24,9 +24,9 @@ See the docs/ directory for full details.
 
 Pre-generated boxes are stored in library/:
 - Standard boxes are grouped by external size
-- Template boxes are grouped by publisher, then by game
+- Preset boxes are grouped by publisher, then by game
 
-This keeps configurable standard boxes easy to browse by dimensions, and finalized game templates easy to find by their canonical commercial name.
+This keeps configurable standard boxes easy to browse by dimensions, and finalized game presets easy to find by their canonical commercial name.
 
 ## License
 MIT License. See LICENSE.

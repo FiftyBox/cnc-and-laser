@@ -797,7 +797,7 @@ function formatProjectName(project: Box50Project): string {
 
   return project.config.type === "standard"
     ? "Standard Layout"
-    : "Finalized Template";
+    : "Finalized Preset";
 }
 
 function humanizeIdentifier(value: string): string {

@@ -11,7 +11,7 @@ Mortises:
 Optional bottom grooves.
 
 Normative rules for the first production SVG phase:
-- The first production SVG implementation includes one removable divider template spanning the internal depth.
+- The first production SVG implementation includes one default removable divider spanning the internal depth.
 - Divider body height is Hint − 0.5 mm.
 - Divider side tenons are 2.9 mm deep and 3.5 mm high.
 - Divider tenon bottom edge is positioned 3 mm above the divider bottom edge.
@@ -33,9 +33,9 @@ Normative rules for the first programmable Standard layout phase:
 - A secondary separator without any separator joint must reach both walls in its axis.
 - Multiple secondary joints on the same primary separator must remain at least 24 mm apart.
 
-## Template (fixed)
+## Preset (fixed)
 - Finger‑jointed
 - Game-specific
 
 Normative rule:
-- Template separator geometry is out of scope for the first production SVG milestone.
+- Preset separator geometry is out of scope for the first production SVG milestone.
