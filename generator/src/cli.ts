@@ -3,12 +3,12 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { createDefaultConfig, createProject } from "./core/box50.js";
 import { renderProjectSvgWithMode } from "./export/svg.js";
-import type { Box50Config, TypeALayoutDefinition } from "./index.js";
+import type { Box50Config, StandardLayoutDefinition } from "./index.js";
 
 type CliRenderMode = "layout" | "cut";
 
 interface CliArgs {
-  type: "A" | "B";
+  type: "standard" | "template";
   widthUnits: number;
   depthUnits: number;
   heightUnits: number;
@@ -51,8 +51,8 @@ function parseArgs(argv: string[]): CliArgs {
   const outputPath = readOptionalOption(argv, "--out");
   const layoutJsonPath = readOptionalOption(argv, "--layout-json");
 
-  if (type !== "A" && type !== "B") {
-    throw new Error("--type must be A or B.");
+  if (type !== "standard" && type !== "template") {
+    throw new Error("--type must be standard or template.");
   }
 
   const cliArgs: CliArgs = {
@@ -86,23 +86,23 @@ export async function resolveConfigFromCliArgs(args: CliArgs): Promise<Box50Conf
     return partialConfig;
   }
 
-  if (args.type !== "A") {
-    throw new Error("--layout-json is only supported with --type A.");
+  if (args.type !== "standard") {
+    throw new Error("--layout-json is only supported with --type standard.");
   }
 
-  const layout = await loadTypeALayoutFromJson(args.layoutJsonPath);
+  const layout = await loadStandardLayoutFromJson(args.layoutJsonPath);
   return {
     ...partialConfig,
-    typeALayout: layout,
+    standardLayout: layout,
   };
 }
 
-export async function loadTypeALayoutFromJson(layoutJsonPath: string): Promise<TypeALayoutDefinition> {
+export async function loadStandardLayoutFromJson(layoutJsonPath: string): Promise<StandardLayoutDefinition> {
   const resolvedPath = path.resolve(process.cwd(), layoutJsonPath);
   const content = await readFile(resolvedPath, "utf8");
 
   try {
-    return JSON.parse(content) as TypeALayoutDefinition;
+    return JSON.parse(content) as StandardLayoutDefinition;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to parse layout JSON ${resolvedPath}: ${message}`);
@@ -146,7 +146,8 @@ function printHelp(): void {
     "Box50 generator",
     "",
     "Required:",
-    "  --type A|B      Box type",
+    "  --type standard|template",
+    "                  Output family",
     "  --w <int>       Width in 50 mm units",
     "  --d <int>       Depth in 50 mm units",
     "  --h <int>       Height in 50 mm units",
@@ -155,7 +156,7 @@ function printHelp(): void {
     "  --mode <mode>   layout or cut (default: layout)",
     "                  legacy aliases: preview -> layout, production -> cut",
     "  --layout-json <path>",
-    "                  JSON file describing a Type A internal layout",
+    "                  JSON file describing a standard internal layout",
     "  --out <path>    Output SVG path",
   ].join("\n"));
 }

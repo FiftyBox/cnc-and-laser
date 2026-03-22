@@ -2,7 +2,7 @@ import type { ClosedPath, PanelDefinition, PanelGeometry, Point } from "./types.
 
 type EdgeJointStyle = "straight" | "mortise" | "tenon";
 
-const TYPE_A_VERTICAL_JOINT_PITCH = 12.5;
+const STANDARD_VERTICAL_JOINT_PITCH = 12.5;
 
 export function createRectanglePath(width: number, height: number): ClosedPath {
   return createOffsetRectanglePath(0, 0, width, height);
@@ -26,7 +26,7 @@ export function createPanelGeometry(panel: PanelDefinition): PanelGeometry {
   };
 }
 
-export function createTypeABottomPanelGeometry(options: {
+export function createStandardBottomPanelGeometry(options: {
   name: string;
   width: number;
   height: number;
@@ -52,7 +52,7 @@ export function createTypeABottomPanelGeometry(options: {
   };
 }
 
-export function createTypeARailProfilePath(options: {
+export function createStandardRailProfilePath(options: {
   panelWidth: number;
   materialThickness: number;
   topOffset: number;
@@ -88,7 +88,7 @@ export function createTypeARailProfilePath(options: {
   };
 }
 
-export function createTypeADividerPanelGeometry(options: {
+export function createStandardDividerPanelGeometry(options: {
   name: string;
   width: number;
   height: number;
@@ -218,7 +218,7 @@ function createBottomTenonEdgePoints(options: {
   return points;
 }
 
-export function createTypeAWallPanelGeometry(options: {
+export function createStandardWallPanelGeometry(options: {
   name: string;
   width: number;
   height: number;
@@ -471,7 +471,7 @@ function createHorizontalEdgePoints(options: {
   }
 
   const points: Point[] = [];
-  const segmentCount = Math.max(1, Math.round(length / TYPE_A_VERTICAL_JOINT_PITCH));
+  const segmentCount = Math.max(1, Math.round(length / STANDARD_VERTICAL_JOINT_PITCH));
   const segmentLength = length / segmentCount;
   const restY = start.y;
   const activeY = resolveActiveY(side, style, restY, materialThickness);
@@ -508,7 +508,7 @@ function createVerticalEdgePoints(options: {
   }
 
   const points: Point[] = [];
-  const segmentCount = Math.max(1, Math.round(height / TYPE_A_VERTICAL_JOINT_PITCH));
+  const segmentCount = Math.max(1, Math.round(height / STANDARD_VERTICAL_JOINT_PITCH));
   const segmentHeight = height / segmentCount;
   const restX = top.x;
   const activeX = resolveActiveX(side, style, restX, materialThickness);

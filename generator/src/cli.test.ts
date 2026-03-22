@@ -5,14 +5,14 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { parseArgs, resolveConfigFromCliArgs } from "./cli.js";
 
-test("resolveConfigFromCliArgs loads a Type A layout from JSON", async () => {
+test("resolveConfigFromCliArgs loads a Standard layout from JSON", async () => {
   const temporaryDirectory = await mkdtemp(path.join(tmpdir(), "box50-cli-"));
 
   try {
     const layoutPath = path.join(temporaryDirectory, "layout.json");
     await writeFile(layoutPath, JSON.stringify({
       id: "layout-from-json",
-      kind: "type-a-layout",
+      kind: "standard-layout",
       referenceFrame: "internal",
       separators: [
         {
@@ -32,7 +32,7 @@ test("resolveConfigFromCliArgs loads a Type A layout from JSON", async () => {
     }), "utf8");
 
     const parsedArgs = parseArgs([
-      "--type", "A",
+      "--type", "standard",
       "--w", "2",
       "--d", "4",
       "--h", "2",
@@ -45,9 +45,9 @@ test("resolveConfigFromCliArgs loads a Type A layout from JSON", async () => {
     try {
       const config = await resolveConfigFromCliArgs(parsedArgs);
 
-      assert.equal(config.typeALayout?.id, "layout-from-json");
-      assert.equal(config.typeALayout?.separators.length, 1);
-      assert.equal(config.typeALayout?.separators[0]?.id, "main-vertical");
+      assert.equal(config.standardLayout?.id, "layout-from-json");
+      assert.equal(config.standardLayout?.separators.length, 1);
+      assert.equal(config.standardLayout?.separators[0]?.id, "main-vertical");
     } finally {
       process.chdir(currentDirectory);
     }
@@ -56,15 +56,15 @@ test("resolveConfigFromCliArgs loads a Type A layout from JSON", async () => {
   }
 });
 
-test("resolveConfigFromCliArgs rejects layout JSON with Type B", async () => {
+test("resolveConfigFromCliArgs rejects layout JSON with Template", async () => {
   await assert.rejects(
     () => resolveConfigFromCliArgs(parseArgs([
-      "--type", "B",
+      "--type", "template",
       "--w", "2",
       "--d", "2",
       "--h", "1",
       "--layout-json", "layout.json",
     ])),
-    /only supported with --type A/,
+    /only supported with --type standard/,
   );
 });

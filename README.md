@@ -5,8 +5,8 @@ Box50 is an open, modular standard for CNC/laser‑cut boxes made from 3mm MDF/P
 The system is:
 - Modular (external dimensions are 50 mm multiples)
 - Maker-friendly (laser/CNC compatible)
-- Flexible (Type A: universal boxes)
-- Optimized (Type B: game-specific boxes)
+- Flexible (standard configurable layouts)
+- Ready for finalized game templates and engraved variants
 - Secure (sliding-lid system)
 
 See the docs/ directory for full details.
@@ -15,7 +15,7 @@ See the docs/ directory for full details.
 - 50 mm grid external sizes (width, depth, height)
 - Rectangular finger-joint assembly
 - Sliding-lid system with dual rails
-- Universal (Type A) or specific (Type B) designs
+- Configurable standard layouts or finalized game templates
 - Modular inserts (cards, tokens, dice…)
 - Fully documented formulas
 - Generator-ready architecture
@@ -23,10 +23,10 @@ See the docs/ directory for full details.
 ## Library
 
 Pre-generated boxes are stored in library/:
-- Type A boxes are grouped by external size
-- Type B boxes are grouped by publisher, then by game
+- Standard boxes are grouped by external size
+- Template boxes are grouped by publisher, then by game
 
-This keeps universal boxes easy to browse by dimensions, and game-specific boxes easy to find by their canonical commercial name.
+This keeps configurable standard boxes easy to browse by dimensions, and finalized game templates easy to find by their canonical commercial name.
 
 ## License
 MIT License. See LICENSE.

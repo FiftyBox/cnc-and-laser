@@ -1,39 +1,39 @@
-export type BoxType = "A" | "B";
+export type BoxProfile = "standard" | "template";
 
 export type SeparatorOrientation = "vertical" | "horizontal";
 export type SeparatorRole = "primary" | "secondary";
 
-export interface TypeASeparatorBottomJoint {
+export interface StandardSeparatorBottomJoint {
   enabled: boolean;
   tenonDepth: number;
   tenonHeight: number;
 }
 
-export interface TypeASeparatorCrossJoint {
+export interface StandardSeparatorCrossJoint {
   with: string;
   mode: "mortise-primary-tenon-secondary";
 }
 
-export interface TypeASeparatorDefinition {
+export interface StandardSeparatorDefinition {
   id: string;
   orientation: SeparatorOrientation;
   role: SeparatorRole;
   position: number;
   spanStart: number;
   spanEnd: number;
-  bottomJoint: TypeASeparatorBottomJoint;
-  crossJoints?: TypeASeparatorCrossJoint[];
+  bottomJoint: StandardSeparatorBottomJoint;
+  crossJoints?: StandardSeparatorCrossJoint[];
 }
 
-export interface TypeALayoutDefinition {
+export interface StandardLayoutDefinition {
   id: string;
-  kind: "type-a-layout";
+  kind: "standard-layout";
   referenceFrame: "internal";
-  separators: TypeASeparatorDefinition[];
+  separators: StandardSeparatorDefinition[];
 }
 
 export interface Box50Config {
-  type: BoxType;
+  type: BoxProfile;
   widthUnits: number;
   depthUnits: number;
   heightUnits: number;
@@ -41,7 +41,7 @@ export interface Box50Config {
   kerf: number;
   lidClearance: number;
   dividerClearance: number;
-  typeALayout?: TypeALayoutDefinition;
+  standardLayout?: StandardLayoutDefinition;
 }
 
 export interface Box50Dimensions {

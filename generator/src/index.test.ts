@@ -5,7 +5,7 @@ import {
   createRectanglePath,
   createDefaultConfig,
   createProject,
-  createTypeARailProfilePath,
+  createStandardRailProfilePath,
   offsetOrthogonalClosedPath,
   renderProjectSvg,
   renderProjectSvgWithMode,
@@ -13,9 +13,9 @@ import {
   validatePanelGeometry,
 } from "./index.js";
 
-test("calculateDimensions computes external and internal dimensions for Type A", () => {
+test("calculateDimensions computes external and internal dimensions for Standard", () => {
   const config = createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
@@ -35,7 +35,7 @@ test("calculateDimensions computes external and internal dimensions for Type A",
 
 test("validateConfig rejects non-positive unit counts", () => {
   const config = createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 0,
     depthUnits: 2,
     heightUnits: 1,
@@ -47,15 +47,15 @@ test("validateConfig rejects non-positive unit counts", () => {
   );
 });
 
-test("createProject builds expected Type A panel set with internal cuts", () => {
+test("createProject builds expected Standard panel set with internal cuts", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
   }));
 
-  assert.equal(project.fileStem, "box50-100x200x100-typeA");
+  assert.equal(project.fileStem, "box50-100x200x100-standard");
   assert.equal(project.panels.length, 5);
   assert.equal(project.panelGeometries.length, 5);
 
@@ -79,15 +79,15 @@ test("createProject builds expected Type A panel set with internal cuts", () => 
   assert.equal(divider.cutPaths.length, 1);
 });
 
-test("createProject builds Type A layout separators and bottom mortises from a bento layout", () => {
+test("createProject builds Standard layout separators and bottom mortises from a bento layout", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
-    typeALayout: {
+    standardLayout: {
       id: "bento-3-right-split",
-      kind: "type-a-layout",
+      kind: "standard-layout",
       referenceFrame: "internal",
       separators: [
         {
@@ -156,15 +156,15 @@ test("createProject builds Type A layout separators and bottom mortises from a b
   assert.equal(secondarySeparator.cutPaths.length, 1);
 });
 
-test("Type A layout separators with bottom mortises generate real bottom tenons", () => {
+test("Standard layout separators with bottom mortises generate real bottom tenons", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
-    typeALayout: {
+    standardLayout: {
       id: "bento-3-right-split",
-      kind: "type-a-layout",
+      kind: "standard-layout",
       referenceFrame: "internal",
       separators: [
         {
@@ -223,16 +223,16 @@ test("Type A layout separators with bottom mortises generate real bottom tenons"
   assert.ok(pointsBelowBottomEdge.some((point) => point.x > 0 && point.x < separator.width));
 });
 
-test("createProject rejects non-traversing primary separators in Type A layouts", () => {
+test("createProject rejects non-traversing primary separators in Standard layouts", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
-      type: "A",
+      type: "standard",
       widthUnits: 2,
       depthUnits: 4,
       heightUnits: 2,
-      typeALayout: {
+      standardLayout: {
         id: "invalid-layout",
-        kind: "type-a-layout",
+        kind: "standard-layout",
         referenceFrame: "internal",
         separators: [
           {
@@ -255,16 +255,16 @@ test("createProject rejects non-traversing primary separators in Type A layouts"
   );
 });
 
-test("createProject rejects Type A separators with spans shorter than the mechanical minimum", () => {
+test("createProject rejects Standard separators with spans shorter than the mechanical minimum", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
-      type: "A",
+      type: "standard",
       widthUnits: 2,
       depthUnits: 4,
       heightUnits: 2,
-      typeALayout: {
+      standardLayout: {
         id: "invalid-short-secondary",
-        kind: "type-a-layout",
+        kind: "standard-layout",
         referenceFrame: "internal",
         separators: [
           {
@@ -312,16 +312,16 @@ test("createProject rejects Type A separators with spans shorter than the mechan
   );
 });
 
-test("createProject rejects parallel Type A separators that are too close", () => {
+test("createProject rejects parallel Standard separators that are too close", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
-      type: "A",
+      type: "standard",
       widthUnits: 4,
       depthUnits: 4,
       heightUnits: 2,
-      typeALayout: {
+      standardLayout: {
         id: "invalid-parallel-gap",
-        kind: "type-a-layout",
+        kind: "standard-layout",
         referenceFrame: "internal",
         separators: [
           {
@@ -357,16 +357,16 @@ test("createProject rejects parallel Type A separators that are too close", () =
   );
 });
 
-test("createProject rejects non-reciprocal Type A joints", () => {
+test("createProject rejects non-reciprocal Standard joints", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
-      type: "A",
+      type: "standard",
       widthUnits: 2,
       depthUnits: 4,
       heightUnits: 2,
-      typeALayout: {
+      standardLayout: {
         id: "invalid-non-reciprocal-joint",
-        kind: "type-a-layout",
+        kind: "standard-layout",
         referenceFrame: "internal",
         separators: [
           {
@@ -411,13 +411,13 @@ test("createProject rejects non-reciprocal Type A joints", () => {
 test("createProject rejects primary separators with joints that are too tightly packed", () => {
   assert.throws(
     () => createProject(createDefaultConfig({
-      type: "A",
+      type: "standard",
       widthUnits: 3,
       depthUnits: 4,
       heightUnits: 2,
-      typeALayout: {
+      standardLayout: {
         id: "invalid-tight-joints",
-        kind: "type-a-layout",
+        kind: "standard-layout",
         referenceFrame: "internal",
         separators: [
           {
@@ -490,7 +490,7 @@ test("createProject rejects primary separators with joints that are too tightly 
 
 test("renderProjectSvg defaults to layout mode", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 1,
     depthUnits: 1,
     heightUnits: 1,
@@ -498,7 +498,7 @@ test("renderProjectSvg defaults to layout mode", () => {
 
   const svg = renderProjectSvg(project);
 
-  assert.match(svg, /Standard Type A/);
+  assert.match(svg, /Standard Layout/);
   assert.match(svg, /logo-frame/);
   assert.match(svg, /Placed Parts/);
   assert.match(svg, /Assembly Plan/);
@@ -511,15 +511,15 @@ test("renderProjectSvg defaults to layout mode", () => {
   assert.doesNotMatch(svg, /class="cut"/);
 });
 
-test("renderProjectSvg renders pictograms for lid and Type A separators", () => {
+test("renderProjectSvg renders pictograms for lid and Standard separators", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 3,
     depthUnits: 4,
     heightUnits: 2,
-    typeALayout: {
+    standardLayout: {
       id: "bento-3-right-split",
-      kind: "type-a-layout",
+      kind: "standard-layout",
       referenceFrame: "internal",
       separators: [
         {
@@ -591,8 +591,8 @@ test("offsetOrthogonalClosedPath expands and contracts axis-aligned rectangles",
   ]);
 });
 
-test("createTypeARailProfilePath creates a stepped loading pocket rail", () => {
-  const rail = createTypeARailProfilePath({
+test("createStandardRailProfilePath creates a stepped loading pocket rail", () => {
+  const rail = createStandardRailProfilePath({
     panelWidth: 100,
     materialThickness: 3,
     topOffset: 3,
@@ -614,7 +614,7 @@ test("createTypeARailProfilePath creates a stepped loading pocket rail", () => {
 
 test("renderProjectSvgWithMode emits a cut-only SVG in cut mode", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 1,
     depthUnits: 1,
     heightUnits: 1,
@@ -632,7 +632,7 @@ test("renderProjectSvgWithMode emits a cut-only SVG in cut mode", () => {
 
 test("renderProjectSvg packs panels by size to reduce wasted shelf height", () => {
   const config = createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 1,
     depthUnits: 1,
     heightUnits: 1,
@@ -686,7 +686,7 @@ test("renderProjectSvg packs panels by size to reduce wasted shelf height", () =
 
 test("renderProjectSvg includes downward protruding tenons in the layout envelope", () => {
   const config = createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 1,
     depthUnits: 1,
     heightUnits: 1,
@@ -730,7 +730,7 @@ test("renderProjectSvg includes downward protruding tenons in the layout envelop
 
 test("renderProjectSvg positions preview markers from the real outer contour bounds", () => {
   const config = createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 1,
     depthUnits: 1,
     heightUnits: 1,
@@ -843,13 +843,13 @@ test("validatePanelGeometry rejects inner cuts that intersect the outer contour"
 
 test("validatePanelGeometry rejects front-back mortises with wrong dimensions", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
-    typeALayout: {
+    standardLayout: {
       id: "wall-lock-reference",
-      kind: "type-a-layout",
+      kind: "standard-layout",
       referenceFrame: "internal",
       separators: [
         {
@@ -895,7 +895,7 @@ test("validatePanelGeometry rejects front-back mortises with wrong dimensions", 
 
 test("validatePanelGeometry rejects side rails with wrong stepped profile dimensions", () => {
   const project = createProject(createDefaultConfig({
-    type: "A",
+    type: "standard",
     widthUnits: 2,
     depthUnits: 4,
     heightUnits: 2,
@@ -912,7 +912,7 @@ test("validatePanelGeometry rejects side rails with wrong stepped profile dimens
     ...leftRight,
     cutPaths: [
       outerPath,
-      createTypeARailProfilePath({
+      createStandardRailProfilePath({
         panelWidth: leftRight.width,
         materialThickness: 3,
         topOffset: 3,

@@ -15,7 +15,7 @@ Normative rules for the first production SVG phase:
 - The groove height is 3.2 mm over the running length.
 - A loading pocket is added at the leading end of the groove.
 - The loading pocket is 6 mm long and extends 3 mm deeper than the running groove.
-- This stepped loading pocket is the normative Type A SVG rail profile for the current production phase.
+- This stepped loading pocket is the normative Standard SVG rail profile for the current production phase.
 
 Lid:
 - Width = Lint

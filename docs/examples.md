@@ -1,6 +1,6 @@
 # Examples
 
-## Reference Validation Case — 100×200×100 Type A
+## Reference Validation Case — 100×200×100 Standard
 Use this box as the primary validation case for the first production SVG phase.
 
 External:
@@ -39,7 +39,7 @@ First rail convention for this validation case:
 - loading pocket length: 6 mm
 - loading pocket extra depth: 3 mm
 
-First Type A mortise-grid convention for this validation case:
+First Standard mortise-grid convention for this validation case:
 - front and back panels contain rectangular mortise slots
 - mortise centers: 25 mm, 50 mm, 75 mm
 - mortise size: 3.1 mm × 4.5 mm

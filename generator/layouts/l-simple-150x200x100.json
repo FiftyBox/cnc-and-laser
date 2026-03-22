@@ -1,6 +1,6 @@
 {
   "id": "l-simple-150x200x100",
-  "kind": "type-a-layout",
+  "kind": "standard-layout",
   "referenceFrame": "internal",
   "separators": [
     {

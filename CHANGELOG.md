@@ -6,7 +6,7 @@
 - Internal dimension rules
 - Sliding-lid specification
 - 3 mm material standard
-- Type A + Type B box families
+- Standard layouts + finalized template families
 - Mortise system for universal boxes
 - Divider specification
 - Module library

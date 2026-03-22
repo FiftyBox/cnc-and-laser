@@ -1,6 +1,6 @@
 {
   "id": "bento-3-left-split-150x200x100",
-  "kind": "type-a-layout",
+  "kind": "standard-layout",
   "referenceFrame": "internal",
   "separators": [
     {

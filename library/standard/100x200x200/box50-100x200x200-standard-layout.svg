@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="510mm" height="902.25mm" viewBox="0 0 510 902.25">
+<style>
+text { font-family: "Segoe UI", sans-serif; fill: #1f2937; }
+.title { font-size: 8px; font-weight: 700; }
+.meta { font-size: 4.2px; }
+.label { font-size: 5px; font-weight: 600; }
+.note { font-size: 3.2px; }
+.sheet { fill: #f8fafc; stroke: #64748b; stroke-width: 0.5; stroke-dasharray: 3 2; }
+.part { fill: #e2e8f0; stroke: #0f172a; stroke-width: 0.4; }
+.inner-cut { fill: rgba(148, 163, 184, 0.18); stroke: #475569; stroke-width: 0.25; }
+.marker-line { stroke: #64748b; stroke-width: 0.35; }
+.marker-badge { fill: #ffffff; stroke: #0f172a; stroke-width: 0.35; }
+.marker-text { font-size: 3.2px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.legend-box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 0.4; }
+.legend-title { font-size: 5px; font-weight: 700; }
+.legend-item { font-size: 3.4px; }
+</style>
+<rect x="0" y="0" width="510" height="902.25" fill="#ffffff" />
+<text x="12" y="12" class="title">Box50 Layout</text>
+<text x="12" y="20" class="meta">Standard • Material 3 mm • Kerf 0.1 mm</text>
+<text x="12" y="26" class="meta">External 100 × 200 × 200 mm</text>
+<text x="12" y="32" class="meta">Internal 94.00 × 194.00 × 190.75 mm</text>
+<text x="12" y="38" class="meta">Required sheet envelope 320.00 × 820.25 mm</text>
+<text x="12" y="44" class="meta">Layout shows placed parts and internal cuts for sheet-size estimation.</text>
+<rect x="12" y="70" width="320" height="820.25" class="sheet" />
+<g>
+<path d="M 15 73 L 15 70 L 26.75 70 L 26.75 73 L 38.5 73 L 38.5 70 L 50.25 70 L 50.25 73 L 62 73 L 62 70 L 73.75 70 L 73.75 73 L 85.5 73 L 85.5 70 L 97.25 70 L 97.25 73 L 109 73 L 112 73 L 112 85.125 L 109 85.125 L 109 97.25 L 112 97.25 L 112 109.375 L 109 109.375 L 109 121.5 L 112 121.5 L 112 133.625 L 109 133.625 L 109 145.75 L 112 145.75 L 112 157.875 L 109 157.875 L 109 170 L 112 170 L 112 182.125 L 109 182.125 L 109 194.25 L 112 194.25 L 112 206.375 L 109 206.375 L 109 218.5 L 112 218.5 L 112 230.625 L 109 230.625 L 109 242.75 L 112 242.75 L 112 254.875 L 109 254.875 L 109 267 L 109 270 L 97.25 270 L 97.25 267 L 85.5 267 L 85.5 270 L 73.75 270 L 73.75 267 L 62 267 L 62 270 L 50.25 270 L 50.25 267 L 38.5 267 L 38.5 270 L 26.75 270 L 26.75 267 L 15 267 L 15 254.875 L 12 254.875 L 12 242.75 L 15 242.75 L 15 230.625 L 12 230.625 L 12 218.5 L 15 218.5 L 15 206.375 L 12 206.375 L 12 194.25 L 15 194.25 L 15 182.125 L 12 182.125 L 12 170 L 15 170 L 15 157.875 L 12 157.875 L 12 145.75 L 15 145.75 L 15 133.625 L 12 133.625 L 12 121.5 L 15 121.5 L 15 109.375 L 12 109.375 L 12 97.25 L 15 97.25 L 15 85.125 L 12 85.125 L 12 73 Z" class="part" />
+
+<line x1="62" y1="68.5" x2="62" y2="70" class="marker-line" />
+<circle cx="62" cy="64" r="4.5" class="marker-badge" />
+<text x="62" y="64" class="marker-text">1</text>
+</g>
+<g>
+<path d="M 122 70 L 222 70 L 219 70 L 219 82.5 L 222 82.5 L 222 95 L 219 95 L 219 107.5 L 222 107.5 L 222 120 L 219 120 L 219 132.5 L 222 132.5 L 222 145 L 219 145 L 219 157.5 L 222 157.5 L 222 170 L 219 170 L 219 182.5 L 222 182.5 L 222 195 L 219 195 L 219 207.5 L 222 207.5 L 222 220 L 219 220 L 219 232.5 L 222 232.5 L 222 245 L 219 245 L 219 257.5 L 222 257.5 L 222 270 L 222 267 L 209.5 267 L 209.5 270 L 197 270 L 197 267 L 184.5 267 L 184.5 270 L 172 270 L 172 267 L 159.5 267 L 159.5 270 L 147 270 L 147 267 L 134.5 267 L 134.5 270 L 122 270 L 122 257.5 L 125 257.5 L 125 245 L 122 245 L 122 232.5 L 125 232.5 L 125 220 L 122 220 L 122 207.5 L 125 207.5 L 125 195 L 122 195 L 122 182.5 L 125 182.5 L 125 170 L 122 170 L 122 157.5 L 125 157.5 L 125 145 L 122 145 L 122 132.5 L 125 132.5 L 125 120 L 122 120 L 122 107.5 L 125 107.5 L 125 95 L 122 95 L 122 82.5 L 125 82.5 L 125 70 Z" class="part" />
+<path d="M 145.45 259.5 L 148.55 259.5 L 148.55 264 L 145.45 264 Z" class="inner-cut" />
+<path d="M 170.45 259.5 L 173.55 259.5 L 173.55 264 L 170.45 264 Z" class="inner-cut" />
+<path d="M 195.45 259.5 L 198.55 259.5 L 198.55 264 L 195.45 264 Z" class="inner-cut" />
+<line x1="172" y1="68.5" x2="172" y2="70" class="marker-line" />
+<circle cx="172" cy="64" r="4.5" class="marker-badge" />
+<text x="172" y="64" class="marker-text">2</text>
+</g>
+<g>
+<path d="M 232 70 L 332 70 L 329 70 L 329 82.5 L 332 82.5 L 332 95 L 329 95 L 329 107.5 L 332 107.5 L 332 120 L 329 120 L 329 132.5 L 332 132.5 L 332 145 L 329 145 L 329 157.5 L 332 157.5 L 332 170 L 329 170 L 329 182.5 L 332 182.5 L 332 195 L 329 195 L 329 207.5 L 332 207.5 L 332 220 L 329 220 L 329 232.5 L 332 232.5 L 332 245 L 329 245 L 329 257.5 L 332 257.5 L 332 270 L 332 267 L 319.5 267 L 319.5 270 L 307 270 L 307 267 L 294.5 267 L 294.5 270 L 282 270 L 282 267 L 269.5 267 L 269.5 270 L 257 270 L 257 267 L 244.5 267 L 244.5 270 L 232 270 L 232 257.5 L 235 257.5 L 235 245 L 232 245 L 232 232.5 L 235 232.5 L 235 220 L 232 220 L 232 207.5 L 235 207.5 L 235 195 L 232 195 L 232 182.5 L 235 182.5 L 235 170 L 232 170 L 232 157.5 L 235 157.5 L 235 145 L 232 145 L 232 132.5 L 235 132.5 L 235 120 L 232 120 L 232 107.5 L 235 107.5 L 235 95 L 232 95 L 232 82.5 L 235 82.5 L 235 70 Z" class="part" />
+<path d="M 255.45 259.5 L 258.55 259.5 L 258.55 264 L 255.45 264 Z" class="inner-cut" />
+<path d="M 280.45 259.5 L 283.55 259.5 L 283.55 264 L 280.45 264 Z" class="inner-cut" />
+<path d="M 305.45 259.5 L 308.55 259.5 L 308.55 264 L 305.45 264 Z" class="inner-cut" />
+<line x1="282" y1="68.5" x2="282" y2="70" class="marker-line" />
+<circle cx="282" cy="64" r="4.5" class="marker-badge" />
+<text x="282" y="64" class="marker-text">3</text>
+</g>
+<g>
+<path d="M 15 280 L 209 280 L 212 280 L 212 292.5 L 209 292.5 L 209 305 L 212 305 L 212 317.5 L 209 317.5 L 209 330 L 212 330 L 212 342.5 L 209 342.5 L 209 355 L 212 355 L 212 367.5 L 209 367.5 L 209 380 L 212 380 L 212 392.5 L 209 392.5 L 209 405 L 212 405 L 212 417.5 L 209 417.5 L 209 430 L 212 430 L 212 442.5 L 209 442.5 L 209 455 L 212 455 L 212 467.5 L 209 467.5 L 209 480 L 209 477 L 196.875 477 L 196.875 480 L 184.75 480 L 184.75 477 L 172.625 477 L 172.625 480 L 160.5 480 L 160.5 477 L 148.375 477 L 148.375 480 L 136.25 480 L 136.25 477 L 124.125 477 L 124.125 480 L 112 480 L 112 477 L 99.875 477 L 99.875 480 L 87.75 480 L 87.75 477 L 75.625 477 L 75.625 480 L 63.5 480 L 63.5 477 L 51.375 477 L 51.375 480 L 39.25 480 L 39.25 477 L 27.125 477 L 27.125 480 L 15 480 L 15 467.5 L 12 467.5 L 12 455 L 15 455 L 15 442.5 L 12 442.5 L 12 430 L 15 430 L 15 417.5 L 12 417.5 L 12 405 L 15 405 L 15 392.5 L 12 392.5 L 12 380 L 15 380 L 15 367.5 L 12 367.5 L 12 355 L 15 355 L 15 342.5 L 12 342.5 L 12 330 L 15 330 L 15 317.5 L 12 317.5 L 12 305 L 15 305 L 15 292.5 L 12 292.5 L 12 280 Z" class="part" />
+<path d="M 15 283 L 209 283 L 209 286.2 L 21 286.2 L 21 289.2 L 15 289.2 Z" class="inner-cut" />
+<line x1="112" y1="277" x2="112" y2="280" class="marker-line" />
+<circle cx="112" cy="272.5" r="4.5" class="marker-badge" />
+<text x="112" y="272.5" class="marker-text">4</text>
+</g>
+<g>
+<path d="M 15 490 L 209 490 L 212 490 L 212 502.5 L 209 502.5 L 209 515 L 212 515 L 212 527.5 L 209 527.5 L 209 540 L 212 540 L 212 552.5 L 209 552.5 L 209 565 L 212 565 L 212 577.5 L 209 577.5 L 209 590 L 212 590 L 212 602.5 L 209 602.5 L 209 615 L 212 615 L 212 627.5 L 209 627.5 L 209 640 L 212 640 L 212 652.5 L 209 652.5 L 209 665 L 212 665 L 212 677.5 L 209 677.5 L 209 690 L 209 687 L 196.875 687 L 196.875 690 L 184.75 690 L 184.75 687 L 172.625 687 L 172.625 690 L 160.5 690 L 160.5 687 L 148.375 687 L 148.375 690 L 136.25 690 L 136.25 687 L 124.125 687 L 124.125 690 L 112 690 L 112 687 L 99.875 687 L 99.875 690 L 87.75 690 L 87.75 687 L 75.625 687 L 75.625 690 L 63.5 690 L 63.5 687 L 51.375 687 L 51.375 690 L 39.25 690 L 39.25 687 L 27.125 687 L 27.125 690 L 15 690 L 15 677.5 L 12 677.5 L 12 665 L 15 665 L 15 652.5 L 12 652.5 L 12 640 L 15 640 L 15 627.5 L 12 627.5 L 12 615 L 15 615 L 15 602.5 L 12 602.5 L 12 590 L 15 590 L 15 577.5 L 12 577.5 L 12 565 L 15 565 L 15 552.5 L 12 552.5 L 12 540 L 15 540 L 15 527.5 L 12 527.5 L 12 515 L 15 515 L 15 502.5 L 12 502.5 L 12 490 Z" class="part" />
+<path d="M 15 493 L 209 493 L 209 496.2 L 21 496.2 L 21 499.2 L 15 499.2 Z" class="inner-cut" />
+<line x1="112" y1="487" x2="112" y2="490" class="marker-line" />
+<circle cx="112" cy="482.5" r="4.5" class="marker-badge" />
+<text x="112" y="482.5" class="marker-text">5</text>
+</g>
+<g>
+<path d="M 222 490 L 316 490 L 316 690 L 222 690 Z" class="part" />
+
+<line x1="269" y1="487" x2="269" y2="490" class="marker-line" />
+<circle cx="269" cy="482.5" r="4.5" class="marker-badge" />
+<text x="269" y="482.5" class="marker-text">6</text>
+</g>
+<g>
+<path d="M 14.9 700 L 208.9 700 L 208.9 883.75 L 211.8 883.75 L 211.8 887.25 L 208.9 887.25 L 208.9 890.25 L 14.9 890.25 L 14.9 887.25 L 12 887.25 L 12 883.75 L 14.9 883.75 Z" class="part" />
+
+<line x1="111.9" y1="697" x2="111.9" y2="700" class="marker-line" />
+<circle cx="111.9" cy="692.5" r="4.5" class="marker-badge" />
+<text x="111.9" y="692.5" class="marker-text">7</text>
+</g>
+<g>
+<rect x="348" y="70" width="150" height="120" rx="3" class="legend-box" />
+<text x="356" y="78" class="legend-title">Placed Parts</text>
+<circle cx="356" cy="82" r="4.5" class="marker-badge" />
+<text x="356" y="82" class="marker-text">1</text>
+<text x="366" y="80" class="legend-item">bottom ×1</text>
+<text x="366" y="85" class="legend-item">100 × 200 mm</text>
+<text x="366" y="90" class="legend-item">Base panel</text>
+<circle cx="356" cy="98" r="4.5" class="marker-badge" />
+<text x="356" y="98" class="marker-text">2</text>
+<text x="366" y="96" class="legend-item">front-back ×1</text>
+<text x="366" y="101" class="legend-item">100 × 200 mm</text>
+<text x="366" y="106" class="legend-item">Main walls. Universal layout, rem…</text>
+<circle cx="356" cy="114" r="4.5" class="marker-badge" />
+<text x="356" y="114" class="marker-text">3</text>
+<text x="366" y="112" class="legend-item">front-back ×1</text>
+<text x="366" y="117" class="legend-item">100 × 200 mm</text>
+<text x="366" y="122" class="legend-item">Main walls. Universal layout, rem…</text>
+<circle cx="356" cy="130" r="4.5" class="marker-badge" />
+<text x="356" y="130" class="marker-text">4</text>
+<text x="366" y="128" class="legend-item">left-right ×1</text>
+<text x="366" y="133" class="legend-item">200 × 200 mm</text>
+<text x="366" y="138" class="legend-item">Side walls with stepped lid-rail …</text>
+<circle cx="356" cy="146" r="4.5" class="marker-badge" />
+<text x="356" y="146" class="marker-text">5</text>
+<text x="366" y="144" class="legend-item">left-right ×1</text>
+<text x="366" y="149" class="legend-item">200 × 200 mm</text>
+<text x="366" y="154" class="legend-item">Side walls with stepped lid-rail …</text>
+<circle cx="356" cy="162" r="4.5" class="marker-badge" />
+<text x="356" y="162" class="marker-text">6</text>
+<text x="366" y="160" class="legend-item">lid ×1</text>
+<text x="366" y="165" class="legend-item">94 × 200 mm</text>
+<text x="366" y="170" class="legend-item">Sliding lid with clearance 0.25 mm</text>
+<circle cx="356" cy="178" r="4.5" class="marker-badge" />
+<text x="356" y="178" class="marker-text">7</text>
+<text x="366" y="176" class="legend-item">divider-depth-template ×1</text>
+<text x="366" y="181" class="legend-item">199.8 × 190.25 mm</text>
+<text x="366" y="186" class="legend-item">First removable divider template …</text>
+</g>
+</svg>

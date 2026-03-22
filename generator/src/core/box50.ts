@@ -1,5 +1,5 @@
-import { createOffsetRectanglePath, createPanelGeometry, createTypeABottomPanelGeometry, createTypeADividerPanelGeometry, createTypeARailProfilePath, createTypeAWallPanelGeometry } from "./geometry.js";
-import type { Box50Config, Box50Dimensions, Box50Project, ClosedPath, PanelDefinition, PanelGeometry, TypeALayoutDefinition, TypeASeparatorDefinition } from "./types.js";
+import { createOffsetRectanglePath, createPanelGeometry, createStandardBottomPanelGeometry, createStandardDividerPanelGeometry, createStandardRailProfilePath, createStandardWallPanelGeometry } from "./geometry.js";
+import type { Box50Config, Box50Dimensions, Box50Project, ClosedPath, PanelDefinition, PanelGeometry, StandardLayoutDefinition, StandardSeparatorDefinition } from "./types.js";
 import { validateProjectGeometry } from "./validation.js";
 
 const BOX_GRID_MM = 50;
@@ -7,20 +7,20 @@ const DEFAULT_MATERIAL_THICKNESS = 3;
 const DEFAULT_KERF = 0.1;
 const DEFAULT_LID_CLEARANCE = 0.25;
 const DEFAULT_DIVIDER_CLEARANCE = 0.5;
-const TYPE_A_SEPARATOR_TENON_DEPTH = 2.9;
-const TYPE_A_SEPARATOR_TENON_HEIGHT = 3.5;
-const TYPE_A_SEPARATOR_MORTISE_WIDTH = 3.1;
-const TYPE_A_SEPARATOR_MORTISE_HEIGHT = 4.5;
-const TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH = 4.5;
-const TYPE_A_SEPARATOR_BOTTOM_ANCHOR_INSET = 12;
-const TYPE_A_SEPARATOR_MIN_PRIMARY_END_MARGIN = 8;
-const TYPE_A_SEPARATOR_SIDE_LOCK_GAP = 2;
-const TYPE_A_SEPARATOR_MIN_SPAN_LENGTH = 30;
-const TYPE_A_SEPARATOR_MIN_AXIS_GAP = 18;
-const TYPE_A_PRIMARY_MIN_JOINT_SPACING = 24;
+const STANDARD_SEPARATOR_TENON_DEPTH = 2.9;
+const STANDARD_SEPARATOR_TENON_HEIGHT = 3.5;
+const STANDARD_SEPARATOR_MORTISE_WIDTH = 3.1;
+const STANDARD_SEPARATOR_MORTISE_HEIGHT = 4.5;
+const STANDARD_SEPARATOR_BOTTOM_SLOT_LENGTH = 4.5;
+const STANDARD_SEPARATOR_BOTTOM_ANCHOR_INSET = 12;
+const STANDARD_SEPARATOR_MIN_PRIMARY_END_MARGIN = 8;
+const STANDARD_SEPARATOR_SIDE_LOCK_GAP = 2;
+const STANDARD_SEPARATOR_MIN_SPAN_LENGTH = 30;
+const STANDARD_SEPARATOR_MIN_AXIS_GAP = 18;
+const STANDARD_PRIMARY_MIN_JOINT_SPACING = 24;
 
-interface ResolvedTypeASeparator {
-  definition: TypeASeparatorDefinition;
+interface ResolvedStandardSeparator {
+  definition: StandardSeparatorDefinition;
   panelName: string;
   spanLength: number;
   panelWidth: number;
@@ -35,9 +35,9 @@ interface ResolvedTypeASeparator {
   }>;
 }
 
-interface ResolvedTypeALayout {
-  layout: TypeALayoutDefinition;
-  separators: ResolvedTypeASeparator[];
+interface ResolvedStandardLayout {
+  layout: StandardLayoutDefinition;
+  separators: ResolvedStandardSeparator[];
   bottomMortisePaths: ClosedPath[];
   frontBackWallMortisePaths: ClosedPath[];
   leftRightWallMortisePaths: ClosedPath[];
@@ -97,10 +97,10 @@ export function buildPanels(dimensions: Box50Dimensions, config: Box50Config): P
   return buildPanelsWithLayout(dimensions, config);
 }
 
-function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config, resolvedLayout?: ResolvedTypeALayout): PanelDefinition[] {
-  const typeLabel = config.type === "A"
-    ? `Universal layout, removable dividers clearance ${formatMillimeters(config.dividerClearance)}`
-    : "Specific layout, fixed divider geometry to be added";
+function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config, resolvedLayout?: ResolvedStandardLayout): PanelDefinition[] {
+  const typeLabel = config.type === "standard"
+    ? `Standard configurable layout, divider clearance ${formatMillimeters(config.dividerClearance)}`
+    : "Finalized template geometry, engraving and game-specific features allowed";
   const panels: PanelDefinition[] = [
     {
       name: "bottom",
@@ -132,14 +132,14 @@ function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config,
     },
   ];
 
-  if (config.type === "A") {
+  if (config.type === "standard") {
     if (resolvedLayout !== undefined) {
       panels.push(...resolvedLayout.separators.map((separator) => ({
         name: separator.panelName,
         width: separator.panelWidth,
         height: separator.panelHeight,
         quantity: 1,
-        note: buildTypeASeparatorNote(separator.definition),
+        note: buildStandardSeparatorNote(separator.definition),
       })));
     } else {
       panels.push({
@@ -147,7 +147,7 @@ function buildPanelsWithLayout(dimensions: Box50Dimensions, config: Box50Config,
         width: dimensions.internalDepth + 5.8,
         height: dimensions.internalHeight - config.dividerClearance,
         quantity: 1,
-        note: "First removable divider template spanning internal depth",
+        note: "Default divider template spanning internal depth",
       });
     }
   }
@@ -159,11 +159,11 @@ export function buildPanelGeometries(panels: PanelDefinition[]): PanelGeometry[]
   return panels.map((panel) => createPanelGeometry(panel));
 }
 
-export function buildTypeAPanelGeometries(
+export function buildStandardPanelGeometries(
   dimensions: Box50Dimensions,
   config: Box50Config,
   panels: PanelDefinition[],
-  resolvedLayout?: ResolvedTypeALayout,
+  resolvedLayout?: ResolvedStandardLayout,
 ): PanelGeometry[] {
   const separatorLookup = new Map(resolvedLayout?.separators.map((separator) => [separator.panelName, separator]) ?? []);
 
@@ -171,7 +171,7 @@ export function buildTypeAPanelGeometries(
     if (panel.name === "bottom") {
       const extraCutPaths = resolvedLayout?.bottomMortisePaths;
 
-      return createTypeABottomPanelGeometry({
+      return createStandardBottomPanelGeometry({
         ...panel,
         width: dimensions.externalWidth,
         height: dimensions.externalDepth,
@@ -183,7 +183,7 @@ export function buildTypeAPanelGeometries(
     if (panel.name === "front-back") {
       const extraCutPaths = resolvedLayout?.frontBackWallMortisePaths ?? [];
 
-      return createTypeAWallPanelGeometry({
+      return createStandardWallPanelGeometry({
         ...panel,
         width: dimensions.externalWidth,
         height: dimensions.externalHeight,
@@ -197,7 +197,7 @@ export function buildTypeAPanelGeometries(
     }
 
     if (panel.name === "left-right") {
-      return createTypeAWallPanelGeometry({
+      return createStandardWallPanelGeometry({
         ...panel,
         width: dimensions.externalDepth,
         height: dimensions.externalHeight,
@@ -207,7 +207,7 @@ export function buildTypeAPanelGeometries(
         leftEdge: "tenon",
         rightEdge: "tenon",
         extraCutPaths: [
-          createTypeARailProfilePath({
+          createStandardRailProfilePath({
             panelWidth: dimensions.externalDepth,
             materialThickness: config.materialThickness,
             topOffset: config.materialThickness,
@@ -222,7 +222,7 @@ export function buildTypeAPanelGeometries(
     }
 
     if (panel.name === "divider-depth-template") {
-      return createTypeADividerPanelGeometry({
+      return createStandardDividerPanelGeometry({
         ...panel,
         width: dimensions.internalDepth + 5.8,
         height: dimensions.internalHeight - config.dividerClearance,
@@ -237,13 +237,13 @@ export function buildTypeAPanelGeometries(
     if (resolvedSeparator !== undefined) {
       const startEdgeDepth = resolvedSeparator.edgeTenons.find((edgeTenon) => edgeTenon.edge === "start")?.depth ?? 0;
       const mortiseCutPaths = resolvedSeparator.mortisePositions.map((position) => createOffsetRectanglePath(
-        startEdgeDepth + position - (TYPE_A_SEPARATOR_MORTISE_WIDTH / 2),
-        resolvedSeparator.panelHeight - config.materialThickness - config.materialThickness - TYPE_A_SEPARATOR_MORTISE_HEIGHT,
-        TYPE_A_SEPARATOR_MORTISE_WIDTH,
-        TYPE_A_SEPARATOR_MORTISE_HEIGHT,
+        startEdgeDepth + position - (STANDARD_SEPARATOR_MORTISE_WIDTH / 2),
+        resolvedSeparator.panelHeight - config.materialThickness - config.materialThickness - STANDARD_SEPARATOR_MORTISE_HEIGHT,
+        STANDARD_SEPARATOR_MORTISE_WIDTH,
+        STANDARD_SEPARATOR_MORTISE_HEIGHT,
       ));
 
-      return createTypeADividerPanelGeometry({
+      return createStandardDividerPanelGeometry({
         ...panel,
         width: resolvedSeparator.spanLength,
         height: resolvedSeparator.panelHeight,
@@ -255,7 +255,7 @@ export function buildTypeAPanelGeometries(
           ? {}
           : {
             bottomTenonCenters: resolvedSeparator.bottomAnchorCenters,
-            bottomTenonLength: TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH,
+            bottomTenonLength: STANDARD_SEPARATOR_BOTTOM_SLOT_LENGTH,
           }),
         ...(mortiseCutPaths.length === 0 ? {} : { mortiseCutPaths }),
       });
@@ -268,12 +268,12 @@ export function buildTypeAPanelGeometries(
 export function createProject(config: Box50Config): Box50Project {
   validateConfig(config);
   const dimensions = calculateDimensions(config);
-  const resolvedLayout = config.type === "A" && config.typeALayout !== undefined
-    ? resolveTypeALayout(config.typeALayout, dimensions, config)
+  const resolvedLayout = config.type === "standard" && config.standardLayout !== undefined
+    ? resolveStandardLayout(config.standardLayout, dimensions, config)
     : undefined;
   const panels = buildPanelsWithLayout(dimensions, config, resolvedLayout);
-  const panelGeometries = config.type === "A"
-    ? buildTypeAPanelGeometries(dimensions, config, panels, resolvedLayout)
+  const panelGeometries = config.type === "standard"
+    ? buildStandardPanelGeometries(dimensions, config, panels, resolvedLayout)
     : buildPanelGeometries(panels);
 
   const project: Box50Project = {
@@ -290,7 +290,7 @@ export function createProject(config: Box50Config): Box50Project {
 }
 
 export function buildFileStem(dimensions: Box50Dimensions, type: Box50Config["type"]): string {
-  return `box50-${dimensions.externalWidth}x${dimensions.externalDepth}x${dimensions.externalHeight}-type${type}`;
+  return `box50-${dimensions.externalWidth}x${dimensions.externalDepth}x${dimensions.externalHeight}-${type}`;
 }
 
 export function formatMillimeters(value: number): string {
@@ -298,22 +298,22 @@ export function formatMillimeters(value: number): string {
   return `${rounded} mm`;
 }
 
-function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dimensions, config: Box50Config): ResolvedTypeALayout {
+function resolveStandardLayout(layout: StandardLayoutDefinition, dimensions: Box50Dimensions, config: Box50Config): ResolvedStandardLayout {
   const sideLockBottomOffset = resolveSideLockBottomOffset(config);
   const separatorsById = new Map(layout.separators.map((separator) => [separator.id, separator]));
 
   if (separatorsById.size !== layout.separators.length) {
-    throw new Error("Type A layout separator ids must be unique.");
+    throw new Error("Standard layout separator ids must be unique.");
   }
 
   for (const separator of layout.separators) {
-    validateTypeASeparatorDefinition(separator, dimensions);
+    validateStandardSeparatorDefinition(separator, dimensions);
   }
 
-  validateTypeALayoutBusinessRules(layout.separators);
+  validateStandardLayoutBusinessRules(layout.separators);
 
   const mortisePositionsById = new Map<string, number[]>();
-  const edgeTenonsById = new Map<string, ResolvedTypeASeparator["edgeTenons"]>();
+  const edgeTenonsById = new Map<string, ResolvedStandardSeparator["edgeTenons"]>();
   const seenPairs = new Set<string>();
 
   for (const separator of layout.separators) {
@@ -321,11 +321,11 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
       const target = separatorsById.get(joint.with);
 
       if (target === undefined) {
-        throw new Error(`Type A layout separator ${separator.id} references unknown separator ${joint.with}.`);
+        throw new Error(`Standard layout separator ${separator.id} references unknown separator ${joint.with}.`);
       }
 
       if (!hasReciprocalJoint(target, separator.id)) {
-        throw new Error(`Type A layout joint ${separator.id} -> ${target.id} must be declared on both separators.`);
+        throw new Error(`Standard layout joint ${separator.id} -> ${target.id} must be declared on both separators.`);
       }
 
       const pairKey = [separator.id, target.id].sort().join("::");
@@ -340,36 +340,36 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
       const secondary = separator.role === "secondary" ? separator : target;
 
       if (primary.role !== "primary" || secondary.role !== "secondary") {
-        throw new Error(`Type A layout joint ${separator.id} -> ${target.id} must connect one primary separator and one secondary separator.`);
+        throw new Error(`Standard layout joint ${separator.id} -> ${target.id} must connect one primary separator and one secondary separator.`);
       }
 
       if (primary.orientation === secondary.orientation) {
-        throw new Error(`Type A layout joint ${primary.id} -> ${secondary.id} must connect orthogonal separators.`);
+        throw new Error(`Standard layout joint ${primary.id} -> ${secondary.id} must connect orthogonal separators.`);
       }
 
       const primaryLocalPosition = getIntersectionLocalPosition(primary, secondary);
       const secondaryLocalPosition = getIntersectionLocalPosition(secondary, primary);
 
-      if (primaryLocalPosition <= TYPE_A_SEPARATOR_MIN_PRIMARY_END_MARGIN || primaryLocalPosition >= getSeparatorSpanLength(primary) - TYPE_A_SEPARATOR_MIN_PRIMARY_END_MARGIN) {
-        throw new Error(`Type A layout primary separator ${primary.id} intersection must stay at least ${TYPE_A_SEPARATOR_MIN_PRIMARY_END_MARGIN} mm from both ends.`);
+      if (primaryLocalPosition <= STANDARD_SEPARATOR_MIN_PRIMARY_END_MARGIN || primaryLocalPosition >= getSeparatorSpanLength(primary) - STANDARD_SEPARATOR_MIN_PRIMARY_END_MARGIN) {
+        throw new Error(`Standard layout primary separator ${primary.id} intersection must stay at least ${STANDARD_SEPARATOR_MIN_PRIMARY_END_MARGIN} mm from both ends.`);
       }
 
       if (approxEqual(secondaryLocalPosition, 0)) {
         registerEdgeTenon(edgeTenonsById, secondary.id, {
           edge: "start",
           depth: secondary.bottomJoint.tenonDepth,
-          height: TYPE_A_SEPARATOR_MORTISE_HEIGHT,
+          height: STANDARD_SEPARATOR_MORTISE_HEIGHT,
           bottomOffset: sideLockBottomOffset,
         });
       } else if (approxEqual(secondaryLocalPosition, getSeparatorSpanLength(secondary))) {
         registerEdgeTenon(edgeTenonsById, secondary.id, {
           edge: "end",
           depth: secondary.bottomJoint.tenonDepth,
-          height: TYPE_A_SEPARATOR_MORTISE_HEIGHT,
+          height: STANDARD_SEPARATOR_MORTISE_HEIGHT,
           bottomOffset: sideLockBottomOffset,
         });
       } else {
-        throw new Error(`Type A layout secondary separator ${secondary.id} must meet the primary ${primary.id} at its start or end edge.`);
+        throw new Error(`Standard layout secondary separator ${secondary.id} must meet the primary ${primary.id} at its start or end edge.`);
       }
 
       const currentMortisePositions = mortisePositionsById.get(primary.id) ?? [];
@@ -388,7 +388,7 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
       registerEdgeTenon(edgeTenonsById, separator.id, {
         edge,
         depth: separator.bottomJoint.tenonDepth,
-        height: TYPE_A_SEPARATOR_MORTISE_HEIGHT,
+        height: STANDARD_SEPARATOR_MORTISE_HEIGHT,
           bottomOffset: sideLockBottomOffset,
       });
     }
@@ -408,7 +408,7 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
         : [],
       mortisePositions: mortisePositionsById.get(separator.id) ?? [],
       edgeTenons,
-    } satisfies ResolvedTypeASeparator;
+    } satisfies ResolvedStandardSeparator;
   });
 
   validatePrimaryJointSpacing(separatorsById, mortisePositionsById);
@@ -422,7 +422,7 @@ function resolveTypeALayout(layout: TypeALayoutDefinition, dimensions: Box50Dime
   };
 }
 
-function validateTypeASeparatorDefinition(separator: TypeASeparatorDefinition, dimensions: Box50Dimensions): void {
+function validateStandardSeparatorDefinition(separator: StandardSeparatorDefinition, dimensions: Box50Dimensions): void {
   const maxPosition = separator.orientation === "vertical"
     ? dimensions.internalWidth
     : dimensions.internalDepth;
@@ -431,56 +431,56 @@ function validateTypeASeparatorDefinition(separator: TypeASeparatorDefinition, d
     : dimensions.internalWidth;
 
   if (!Number.isFinite(separator.position) || separator.position < 0 || separator.position > maxPosition) {
-    throw new Error(`Type A layout separator ${separator.id} position must stay within the internal volume.`);
+    throw new Error(`Standard layout separator ${separator.id} position must stay within the internal volume.`);
   }
 
   if (!Number.isFinite(separator.spanStart) || !Number.isFinite(separator.spanEnd) || separator.spanEnd <= separator.spanStart) {
-    throw new Error(`Type A layout separator ${separator.id} must have a strictly positive span.`);
+    throw new Error(`Standard layout separator ${separator.id} must have a strictly positive span.`);
   }
 
   if (separator.spanStart < 0 || separator.spanEnd > maxSpan) {
-    throw new Error(`Type A layout separator ${separator.id} span must stay within the internal volume.`);
+    throw new Error(`Standard layout separator ${separator.id} span must stay within the internal volume.`);
   }
 
-  if (getSeparatorSpanLength(separator) < TYPE_A_SEPARATOR_MIN_SPAN_LENGTH) {
-    throw new Error(`Type A layout separator ${separator.id} span must be at least ${TYPE_A_SEPARATOR_MIN_SPAN_LENGTH} mm.`);
+  if (getSeparatorSpanLength(separator) < STANDARD_SEPARATOR_MIN_SPAN_LENGTH) {
+    throw new Error(`Standard layout separator ${separator.id} span must be at least ${STANDARD_SEPARATOR_MIN_SPAN_LENGTH} mm.`);
   }
 
   if (separator.role === "primary") {
     if (!approxEqual(separator.spanStart, 0) || !approxEqual(separator.spanEnd, maxSpan)) {
-      throw new Error(`Type A primary separator ${separator.id} must be traversing across the full internal ${separator.orientation === "vertical" ? "depth" : "width"}.`);
+      throw new Error(`Standard primary separator ${separator.id} must be traversing across the full internal ${separator.orientation === "vertical" ? "depth" : "width"}.`);
     }
   }
 
   if (!separator.bottomJoint.enabled) {
-    throw new Error(`Type A separator ${separator.id} must keep its bottom joint enabled in V1.`);
+    throw new Error(`Standard separator ${separator.id} must keep its bottom joint enabled in V1.`);
   }
 }
 
-function getSeparatorSpanLength(separator: TypeASeparatorDefinition): number {
+function getSeparatorSpanLength(separator: StandardSeparatorDefinition): number {
   return separator.spanEnd - separator.spanStart;
 }
 
-function getIntersectionLocalPosition(separator: TypeASeparatorDefinition, other: TypeASeparatorDefinition): number {
+function getIntersectionLocalPosition(separator: StandardSeparatorDefinition, other: StandardSeparatorDefinition): number {
   return separator.orientation === "vertical"
     ? other.position - separator.spanStart
     : other.position - separator.spanStart;
 }
 
 function resolveBottomAnchorCenters(spanLength: number): number[] {
-  if (spanLength <= (2 * TYPE_A_SEPARATOR_BOTTOM_ANCHOR_INSET) + TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH) {
+  if (spanLength <= (2 * STANDARD_SEPARATOR_BOTTOM_ANCHOR_INSET) + STANDARD_SEPARATOR_BOTTOM_SLOT_LENGTH) {
     return [spanLength / 2];
   }
 
-  return [TYPE_A_SEPARATOR_BOTTOM_ANCHOR_INSET, spanLength - TYPE_A_SEPARATOR_BOTTOM_ANCHOR_INSET];
+  return [STANDARD_SEPARATOR_BOTTOM_ANCHOR_INSET, spanLength - STANDARD_SEPARATOR_BOTTOM_ANCHOR_INSET];
 }
 
-function buildBottomMortisePaths(separators: ResolvedTypeASeparator[], materialThickness: number): ClosedPath[] {
+function buildBottomMortisePaths(separators: ResolvedStandardSeparator[], materialThickness: number): ClosedPath[] {
   const paths: ClosedPath[] = [];
 
   for (const separator of separators) {
-    const slotWidth = TYPE_A_SEPARATOR_MORTISE_WIDTH;
-    const slotLength = TYPE_A_SEPARATOR_BOTTOM_SLOT_LENGTH;
+    const slotWidth = STANDARD_SEPARATOR_MORTISE_WIDTH;
+    const slotLength = STANDARD_SEPARATOR_BOTTOM_SLOT_LENGTH;
 
     for (const anchorCenter of separator.bottomAnchorCenters) {
       if (separator.definition.orientation === "vertical") {
@@ -513,14 +513,14 @@ function buildBottomMortisePaths(separators: ResolvedTypeASeparator[], materialT
 }
 
 function buildWallMortisePaths(
-  separators: ResolvedTypeASeparator[],
+  separators: ResolvedStandardSeparator[],
   materialThickness: number,
   panelHeight: number,
   wallFamily: "front-back" | "left-right",
   sideLockBottomOffset: number,
 ): ClosedPath[] {
   const paths: ClosedPath[] = [];
-  const mortiseY = panelHeight - sideLockBottomOffset - TYPE_A_SEPARATOR_MORTISE_HEIGHT;
+  const mortiseY = panelHeight - sideLockBottomOffset - STANDARD_SEPARATOR_MORTISE_HEIGHT;
 
   for (const separator of separators) {
     if (wallFamily === "front-back" && separator.definition.orientation !== "vertical") {
@@ -539,17 +539,17 @@ function buildWallMortisePaths(
 
     const centerX = materialThickness + separator.definition.position;
     paths.push(createOffsetRectanglePath(
-      centerX - (TYPE_A_SEPARATOR_MORTISE_WIDTH / 2),
+      centerX - (STANDARD_SEPARATOR_MORTISE_WIDTH / 2),
       mortiseY,
-      TYPE_A_SEPARATOR_MORTISE_WIDTH,
-      TYPE_A_SEPARATOR_MORTISE_HEIGHT,
+      STANDARD_SEPARATOR_MORTISE_WIDTH,
+      STANDARD_SEPARATOR_MORTISE_HEIGHT,
     ));
   }
 
   return paths;
 }
 
-function resolveWallLockEdges(separator: TypeASeparatorDefinition, dimensions: Box50Dimensions): Array<"start" | "end"> {
+function resolveWallLockEdges(separator: StandardSeparatorDefinition, dimensions: Box50Dimensions): Array<"start" | "end"> {
   const maxSpan = separator.orientation === "vertical"
     ? dimensions.internalDepth
     : dimensions.internalWidth;
@@ -567,9 +567,9 @@ function resolveWallLockEdges(separator: TypeASeparatorDefinition, dimensions: B
 }
 
 function registerEdgeTenon(
-  edgeTenonsById: Map<string, ResolvedTypeASeparator["edgeTenons"]>,
+  edgeTenonsById: Map<string, ResolvedStandardSeparator["edgeTenons"]>,
   separatorId: string,
-  edgeTenon: ResolvedTypeASeparator["edgeTenons"][number],
+  edgeTenon: ResolvedStandardSeparator["edgeTenons"][number],
 ): void {
   const current = edgeTenonsById.get(separatorId) ?? [];
 
@@ -582,20 +582,20 @@ function registerEdgeTenon(
 }
 
 function resolveSideLockBottomOffset(config: Box50Config): number {
-  return config.materialThickness + TYPE_A_SEPARATOR_TENON_HEIGHT + TYPE_A_SEPARATOR_SIDE_LOCK_GAP;
+  return config.materialThickness + STANDARD_SEPARATOR_TENON_HEIGHT + STANDARD_SEPARATOR_SIDE_LOCK_GAP;
 }
 
-function buildTypeASeparatorNote(separator: TypeASeparatorDefinition): string {
+function buildStandardSeparatorNote(separator: StandardSeparatorDefinition): string {
   const roleLabel = separator.role === "primary" ? "Primary" : "Secondary";
   const orientationLabel = separator.orientation === "vertical" ? "vertical" : "horizontal";
-  return `Type A ${roleLabel.toLowerCase()} separator, ${orientationLabel} span ${formatMillimeters(separator.spanEnd - separator.spanStart)}`;
+  return `Standard ${roleLabel.toLowerCase()} separator, ${orientationLabel} span ${formatMillimeters(separator.spanEnd - separator.spanStart)}`;
 }
 
 function approxEqual(left: number, right: number, tolerance = 0.05): boolean {
   return Math.abs(left - right) <= tolerance;
 }
 
-function validateTypeALayoutBusinessRules(separators: TypeASeparatorDefinition[]): void {
+function validateStandardLayoutBusinessRules(separators: StandardSeparatorDefinition[]): void {
   for (let leftIndex = 0; leftIndex < separators.length; leftIndex += 1) {
     const left = separators[leftIndex];
 
@@ -612,12 +612,12 @@ function validateTypeALayoutBusinessRules(separators: TypeASeparatorDefinition[]
 
       const axisGap = Math.abs(left.position - right.position);
 
-      if (axisGap < TYPE_A_SEPARATOR_MIN_AXIS_GAP) {
-        throw new Error(`Type A layout separators ${left.id} and ${right.id} are too close on parallel axes; keep at least ${TYPE_A_SEPARATOR_MIN_AXIS_GAP} mm between them.`);
+      if (axisGap < STANDARD_SEPARATOR_MIN_AXIS_GAP) {
+        throw new Error(`Standard layout separators ${left.id} and ${right.id} are too close on parallel axes; keep at least ${STANDARD_SEPARATOR_MIN_AXIS_GAP} mm between them.`);
       }
 
       if (approxEqual(axisGap, 0) && spansOverlap(left.spanStart, left.spanEnd, right.spanStart, right.spanEnd)) {
-        throw new Error(`Type A layout separators ${left.id} and ${right.id} cannot overlap on the same axis.`);
+        throw new Error(`Standard layout separators ${left.id} and ${right.id} cannot overlap on the same axis.`);
       }
     }
 
@@ -625,7 +625,7 @@ function validateTypeALayoutBusinessRules(separators: TypeASeparatorDefinition[]
 }
 
 function validatePrimaryJointSpacing(
-  separatorsById: Map<string, TypeASeparatorDefinition>,
+  separatorsById: Map<string, StandardSeparatorDefinition>,
   mortisePositionsById: Map<string, number[]>,
 ): void {
   for (const [separatorId, positions] of mortisePositionsById.entries()) {
@@ -645,18 +645,18 @@ function validatePrimaryJointSpacing(
         continue;
       }
 
-      if ((current - previous) < TYPE_A_PRIMARY_MIN_JOINT_SPACING) {
-        throw new Error(`Type A primary separator ${separator.id} must keep at least ${TYPE_A_PRIMARY_MIN_JOINT_SPACING} mm between secondary joints.`);
+      if ((current - previous) < STANDARD_PRIMARY_MIN_JOINT_SPACING) {
+        throw new Error(`Standard primary separator ${separator.id} must keep at least ${STANDARD_PRIMARY_MIN_JOINT_SPACING} mm between secondary joints.`);
       }
     }
   }
 }
 
-function hasReciprocalJoint(separator: TypeASeparatorDefinition, targetId: string): boolean {
+function hasReciprocalJoint(separator: StandardSeparatorDefinition, targetId: string): boolean {
   return (separator.crossJoints ?? []).some((joint) => joint.with === targetId);
 }
 
-function resolveWallCount(separator: TypeASeparatorDefinition, dimensions: Box50Dimensions): number {
+function resolveWallCount(separator: StandardSeparatorDefinition, dimensions: Box50Dimensions): number {
   const maxSpan = separator.orientation === "vertical"
     ? dimensions.internalDepth
     : dimensions.internalWidth;
@@ -677,14 +677,14 @@ function spansOverlap(leftStart: number, leftEnd: number, rightStart: number, ri
   return Math.max(leftStart, rightStart) < Math.min(leftEnd, rightEnd);
 }
 
-function validateSecondaryConnectivity(separators: TypeASeparatorDefinition[], dimensions: Box50Dimensions): void {
+function validateSecondaryConnectivity(separators: StandardSeparatorDefinition[], dimensions: Box50Dimensions): void {
   for (const separator of separators) {
     if (separator.role !== "secondary") {
       continue;
     }
 
     if ((separator.crossJoints?.length ?? 0) === 0 && resolveWallCount(separator, dimensions) < 2) {
-      throw new Error(`Type A secondary separator ${separator.id} must either connect to another separator or reach both walls.`);
+      throw new Error(`Standard secondary separator ${separator.id} must either connect to another separator or reach both walls.`);
     }
   }
 }

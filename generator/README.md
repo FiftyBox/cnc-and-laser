@@ -4,11 +4,11 @@ This folder contains the first TypeScript implementation of the Box50 generator.
 
 Current scope:
 - Box50 dimension calculations
-- Type A / Type B parameter handling
+- Standard / Template parameter handling
 - SVG layout export for sheet estimation
 - SVG cut export foundation
 - CLI generation from terminal arguments
-- Programmatic Type A separator layouts with primary/secondary dividers
+- Programmatic Standard separator layouts with primary/secondary dividers
 
 Current limitations:
 - Finger-joint geometry is not yet complete on every potential edge convention
@@ -38,25 +38,25 @@ npm test
 Generate a layout SVG:
 
 ```bash
-npm run generate -- --type A --w 2 --d 4 --h 2 --mode layout --out output/box50-100x200x100-typeA-layout.svg
+npm run generate -- --type standard --w 2 --d 4 --h 2 --mode layout --out output/box50-100x200x100-standard-layout.svg
 ```
 
 Generate a cut SVG foundation:
 
 ```bash
-node dist/cli.js --type A --w 2 --d 4 --h 2 --mode cut --out output/box50-100x200x100-typeA-cut.svg
+node dist/cli.js --type standard --w 2 --d 4 --h 2 --mode cut --out output/box50-100x200x100-standard-cut.svg
 ```
 
 Custom output path:
 
 ```bash
-npm run generate -- --type B --w 2 --d 2 --h 1 --mode layout --out output/box50-100x100x50-typeB-layout.svg
+npm run generate -- --type template --w 2 --d 2 --h 1 --mode layout --out output/box50-100x100x50-template-layout.svg
 ```
 
-Generate from a Type A layout JSON file:
+Generate from a Standard layout JSON file:
 
 ```bash
-npm run generate -- --type A --w 2 --d 4 --h 2 --layout-json layouts/bento.json --mode cut --out output/box50-bento-cut.svg
+npm run generate -- --type standard --w 2 --d 4 --h 2 --layout-json layouts/bento.json --mode cut --out output/box50-bento-cut.svg
 ```
 
 ## Notes
@@ -69,21 +69,21 @@ The current layout SVG is a material-layout view:
 
 The current cut SVG is the first fabrication-oriented foundation: it outputs only closed panel contours without annotations and applies kerf compensation at export time.
 
-The upper wall edges stay straight by design in the current Type A model so the sliding-lid opening remains unobstructed.
+The upper wall edges stay straight by design in the current Standard model so the sliding-lid opening remains unobstructed.
 
 Currently implemented in cut mode:
 - kerf compensation using the configured kerf value
 - rectangular lid contour
-- Type A vertical wall finger-joints using a 12.5 mm pitch convention
-- Type A wall-to-bottom joints on the lower wall edges
-- Type A bottom panel with matching tenon edges
-- Type A side-panel rail profile as a stepped loading-pocket cut
-- legacy removable Type A divider template with side tenons when no explicit layout is provided
-- programmatic Type A layouts with traversing primary separators, partial secondary separators, bottom mortises, primary mortises, and secondary edge tenons
+- Standard vertical wall finger-joints using a 12.5 mm pitch convention
+- Standard wall-to-bottom joints on the lower wall edges
+- Standard bottom panel with matching tenon edges
+- Standard side-panel rail profile as a stepped loading-pocket cut
+- default removable Standard divider template with side tenons when no explicit layout is provided
+- programmatic Standard layouts with traversing primary separators, partial secondary separators, bottom mortises, primary mortises, and secondary edge tenons
 - wall-lock mortises for separators that reach a box wall
 - automatic geometry validation during project generation
 
-Current Type A layout validation includes:
+Current Standard layout validation includes:
 - minimum separator span length
 - minimum spacing between parallel separator axes
 - reciprocal declaration of separator joints
@@ -94,8 +94,8 @@ Still missing:
 - additional topology validation beyond the current orthogonal/self-intersection checks
 
 CLI notes:
-- `--layout-json` loads a JSON file matching the programmatic `TypeALayoutDefinition` shape
-- `--layout-json` is supported only for `--type A`
+- `--layout-json` loads a JSON file matching the programmatic `StandardLayoutDefinition` shape
+- `--layout-json` is supported only for `--type standard`
 
 Legacy compatibility:
 - `--mode preview` is accepted as an alias for `--mode layout`

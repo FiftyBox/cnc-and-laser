@@ -1,6 +1,6 @@
 {
   "id": "bento-2-100x200x100",
-  "kind": "type-a-layout",
+  "kind": "standard-layout",
   "referenceFrame": "internal",
   "separators": [
     {

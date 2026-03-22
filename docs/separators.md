@@ -1,6 +1,6 @@
 # Separators — Box50
 
-## Type A (removable)
+## Standard (removable)
 Tenons:
 - 2.9 mm × 3–3.5 mm
 
@@ -17,8 +17,8 @@ Normative rules for the first production SVG phase:
 - Divider tenon bottom edge is positioned 3 mm above the divider bottom edge.
 - Bottom grooves remain optional and excluded from the first production SVG milestone.
 
-Normative rules for the first programmable Type A layout phase:
-- A Type A layout may declare primary and secondary separators in the internal coordinate frame.
+Normative rules for the first programmable Standard layout phase:
+- A Standard layout may declare primary and secondary separators in the internal coordinate frame.
 - A primary separator is always traversing across the full internal axis in its orientation.
 - A secondary separator may be partial.
 - Every separator keeps a bottom joint in V1.
@@ -33,9 +33,9 @@ Normative rules for the first programmable Type A layout phase:
 - A secondary separator without any separator joint must reach both walls in its axis.
 - Multiple secondary joints on the same primary separator must remain at least 24 mm apart.
 
-## Type B (fixed)
+## Template (fixed)
 - Finger‑jointed
 - Game-specific
 
 Normative rule:
-- Type B separator geometry is out of scope for the first production SVG milestone.
+- Template separator geometry is out of scope for the first production SVG milestone.

@@ -31,22 +31,22 @@ Lid:
 - Thickness = 3 mm
 
 ## 6. Box Types
-### Type A
+### Standard
 - Mortises every 25 mm
 - Optional bottom grooves
 - Removable dividers
 
-### Type B
+### Template
 - No generic mortises
 - Fixed dividers only
 
 ## 7. Divider Systems
-### Type A removable
+### Standard removable
 - Tenons 2.9 mm
 - Mortises 3.1 mm
 - 25 mm spacing
 
-### Type B fixed
+### Template fixed
 - Finger-jointed mini-panels
 
 ## 8. Modules
@@ -57,18 +57,18 @@ Kerf = ~0.1 mm
 Divider clearance = 0.5 mm
 Lid clearance = 0.2–0.3 mm
 
-## 10. Normative Geometry Rules for Type A SVG Production
+## 10. Normative Geometry Rules for Standard SVG Production
 
-The following rules define the first production-oriented geometry model for Type A boxes.
+The following rules define the first production-oriented geometry model for Standard boxes.
 
 ### 10.1 Scope
-- Applies to Type A boxes only.
+- Applies to Standard boxes only.
 - Applies to SVG production output.
 - DXF export is out of scope for this phase.
 - Optional bottom grooves are out of scope for this phase.
 
 ### 10.2 Reference Box
-- The reference validation case is 100×200×100 Type A.
+- The reference validation case is 100×200×100 Standard.
 - All new geometry rules must be validated against this box before being generalized.
 
 ### 10.3 Nominal Dimensions
@@ -87,7 +87,7 @@ The following rules define the first production-oriented geometry model for Type
 - Kerf compensation is applied at SVG cut export time, not by modifying the nominal project dimensions.
 
 ### 10.5 Panel Set
-- Type A production output must include: bottom, front, back, left, right, lid.
+- Standard production output must include: bottom, front, back, left, right, lid.
 - Front and back panels share the same nominal geometry.
 - Left and right panels share the same nominal geometry.
 - Lid width is equal to Lint.
@@ -105,20 +105,20 @@ The following rules define the first production-oriented geometry model for Type
 - Front, back, left, and right wall panels carry inward mortise patterns on their bottom edge.
 - The bottom panel carries the matching outward tenon pattern on all four edges.
 - Top wall edges remain straight by design so the sliding-lid opening stays unobstructed.
-- The first production SVG joint implementation is normative for Type A until a later revision replaces it.
+- The first production SVG joint implementation is normative for Standard until a later revision replaces it.
 
 ### 10.7 Divider Mortise Convention
-- Type A divider mortises are spaced on a 25 mm grid.
+- Standard divider mortises are spaced on a 25 mm grid.
 - In the first production SVG implementation, front and back panels receive rectangular mortise slots.
 - Mortise slot width is 3.1 mm.
 - Mortise slot height is 4.5 mm.
 - Mortise slot centers are aligned at x = 25 mm, then every 25 mm until the last center strictly inside the panel width.
 - Mortise slots are placed on a common horizontal line near the bottom of the panel.
 - The mortise slot bottom edge is positioned 6 mm above the bottom outer edge of the panel.
-- This mortise-grid convention is normative for the first Type A removable-divider implementation.
+- This mortise-grid convention is normative for the first Standard removable-divider implementation.
 
 ### 10.9 First Removable Divider Convention
-- The first production SVG implementation includes one removable divider template for Type A.
+- The first production SVG implementation includes one removable divider template for Standard.
 - The divider template spans the internal depth of the box.
 - Divider body height is Hint − divider clearance.
 - Divider side tenons are rectangular.
@@ -126,7 +126,7 @@ The following rules define the first production-oriented geometry model for Type
 - Tenon height is 3.5 mm.
 - Tenon bottom edge is positioned 3 mm above the bottom edge of the divider template.
 - Divider tenons are placed on the left and right edges only in this phase.
-- This divider template is the normative first removable-divider geometry for Type A production SVG output.
+- This divider template is the normative first removable-divider geometry for Standard production SVG output.
 
 ### 10.8 Sliding Lid Convention
 - Rail nominal width is 3.1 mm.
@@ -140,4 +140,4 @@ The following rules define the first production-oriented geometry model for Type
 - A loading pocket is added at the leading end of the groove.
 - The loading pocket length is 6 mm.
 - The loading pocket extends 3 mm deeper than the running groove.
-- This stepped loading-pocket representation is the normative Type A rail profile for the current production SVG phase.
+- This stepped loading-pocket representation is the normative Standard rail profile for the current production SVG phase.

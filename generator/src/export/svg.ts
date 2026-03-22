@@ -133,7 +133,7 @@ function renderSummary(project: Box50Project, sheetWidth: number, sheetHeight: n
   return [
     renderBox50Logo(PAGE_MARGIN, PAGE_MARGIN - 2),
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 5}" class="subtitle">${escapeXml(projectName)}</text>`,
-    `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 12}" class="meta">Type ${config.type} • Material ${formatMillimeters(config.materialThickness)} • Kerf ${formatMillimeters(config.kerf)}</text>`,
+    `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 12}" class="meta">Profile ${config.type} • Material ${formatMillimeters(config.materialThickness)} • Kerf ${formatMillimeters(config.kerf)}</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 18}" class="meta">External ${dimensions.externalWidth} × ${dimensions.externalDepth} × ${dimensions.externalHeight} mm</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 24}" class="meta">Internal ${dimensions.internalWidth.toFixed(2)} × ${dimensions.internalDepth.toFixed(2)} × ${dimensions.internalHeight.toFixed(2)} mm</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 30}" class="meta">Required sheet envelope ${sheetWidth.toFixed(2)} × ${sheetHeight.toFixed(2)} mm</text>`,
@@ -789,15 +789,15 @@ function formatDisplayNumber(value: number): string {
 }
 
 function formatProjectName(project: Box50Project): string {
-  const layoutId = project.config.typeALayout?.id;
+  const layoutId = project.config.standardLayout?.id;
 
   if (layoutId !== undefined) {
     return humanizeIdentifier(layoutId);
   }
 
-  return project.config.type === "A"
-    ? "Standard Type A"
-    : "Type B Project";
+  return project.config.type === "standard"
+    ? "Standard Layout"
+    : "Finalized Template";
 }
 
 function humanizeIdentifier(value: string): string {
@@ -811,7 +811,7 @@ function humanizeIdentifier(value: string): string {
 }
 
 function buildAssemblySteps(project: Box50Project, panels: PreviewPanelPlacement[]): string[] {
-  const layoutSeparators = new Map((project.config.typeALayout?.separators ?? []).map((separator) => [separator.id, separator]));
+  const layoutSeparators = new Map((project.config.standardLayout?.separators ?? []).map((separator) => [separator.id, separator]));
   const bottomRefs = collectPreviewNumbers(panels, (panel) => panel.name === "bottom");
   const wallRefs = collectPreviewNumbers(panels, (panel) => panel.name === "front-back" || panel.name === "left-right");
   const primarySeparatorRefs = collectPreviewNumbers(panels, (panel) => {
