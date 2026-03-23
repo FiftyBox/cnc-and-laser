@@ -15,8 +15,21 @@ const DIMENSION_TOLERANCE = 0.05;
 export function validateProjectGeometry(project: Box50Project): void {
   const issues: GeometryValidationIssue[] = [];
 
-  for (const panel of project.panelGeometries) {
-    issues.push(...validatePanelGeometry(panel, project.config.materialThickness));
+  const fabricationPlans = (project.fabricationPlans ?? []).length > 0
+    ? (project.fabricationPlans ?? [])
+    : [{
+      id: "main",
+      materialThickness: project.config.materialThickness,
+      kerf: project.config.kerf,
+      panels: project.panels,
+      panelGeometries: project.panelGeometries,
+      fileStem: project.fileStem,
+    }];
+
+  for (const fabricationPlan of fabricationPlans) {
+    for (const panel of fabricationPlan.panelGeometries) {
+      issues.push(...validatePanelGeometry(panel, fabricationPlan.materialThickness));
+    }
   }
 
   if (issues.length > 0) {

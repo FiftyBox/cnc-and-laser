@@ -5,6 +5,7 @@ This folder contains the first TypeScript implementation of the Box50 generator.
 Current scope:
 - Box50 dimension calculations
 - Standard / Preset parameter handling
+- Multi-plan fabrication output for split materials
 - SVG layout export for sheet estimation
 - SVG cut export foundation
 - CLI generation from terminal arguments
@@ -14,6 +15,7 @@ Current limitations:
 - Finger-joint geometry is not yet complete on every potential edge convention
 - CLI layout authoring is not implemented yet
 - DXF export is not generated yet
+- filler and multi-plan authoring is intended to flow through full project config JSON rather than dedicated CLI flags
 
 ## Commands
 
@@ -59,6 +61,12 @@ Generate from a Standard layout JSON file:
 npm run generate -- --type standard --w 2 --d 4 --h 2 --layout-json layouts/bento.json --mode cut --out output/box50-bento-cut.svg
 ```
 
+Generate from a full project config JSON file:
+
+```bash
+npm run generate -- --type standard --w 3 --d 4 --h 2 --config-json configs/fillers-2mm.json --mode cut --out output/
+```
+
 ## Notes
 
 The current layout SVG is a material-layout view:
@@ -81,6 +89,7 @@ Currently implemented in cut mode:
 - default removable Standard divider with side tenons when no explicit layout is provided
 - programmatic Standard layouts with traversing primary separators, partial secondary separators, bottom mortises, primary mortises, and secondary edge tenons
 - wall-lock mortises for separators that reach a box wall
+- filler plates routed to dedicated fabrication plans with their own material thickness and kerf
 - automatic geometry validation during project generation
 
 Current Standard layout validation includes:
@@ -94,8 +103,10 @@ Still missing:
 - additional topology validation beyond the current orthogonal/self-intersection checks
 
 CLI notes:
+- `--config-json` loads and merges a full project config, including fillers and extra fabrication plans
 - `--layout-json` loads a JSON file matching the programmatic `StandardLayoutDefinition` shape
 - `--layout-json` is supported only for `--type standard`
+- when a project produces multiple fabrication plans, the CLI writes one SVG file per plan; in that case `--out` must point to a directory
 
 Legacy compatibility:
 - `--mode preview` is accepted as an alias for `--mode layout`

@@ -32,6 +32,22 @@ export interface StandardLayoutDefinition {
   separators: StandardSeparatorDefinition[];
 }
 
+export interface FabricationPlanDefinition {
+  id: string;
+  materialThickness: number;
+  kerf: number;
+  note?: string;
+}
+
+export interface FillerDefinition {
+  id: string;
+  width: number;
+  height: number;
+  quantity: number;
+  targetPlan?: string;
+  note?: string;
+}
+
 export interface Box50Config {
   type: BoxProfile;
   widthUnits: number;
@@ -42,6 +58,8 @@ export interface Box50Config {
   lidClearance: number;
   dividerClearance: number;
   standardLayout?: StandardLayoutDefinition;
+  fabricationPlans?: FabricationPlanDefinition[];
+  fillers?: FillerDefinition[];
 }
 
 export interface Box50Dimensions {
@@ -79,10 +97,21 @@ export interface PanelGeometry {
   cutPaths: ClosedPath[];
 }
 
+export interface Box50FabricationPlan {
+  id: string;
+  materialThickness: number;
+  kerf: number;
+  note?: string;
+  panels: PanelDefinition[];
+  panelGeometries: PanelGeometry[];
+  fileStem: string;
+}
+
 export interface Box50Project {
   config: Box50Config;
   dimensions: Box50Dimensions;
   panels: PanelDefinition[];
   panelGeometries: PanelGeometry[];
   fileStem: string;
+  fabricationPlans?: Box50FabricationPlan[];
 }

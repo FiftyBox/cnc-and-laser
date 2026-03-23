@@ -8,6 +8,7 @@ import {
   createStandardRailProfilePath,
   offsetOrthogonalClosedPath,
   renderProjectSvg,
+  renderProjectFabricationPlanSvgWithMode,
   renderProjectSvgWithMode,
   validateConfig,
   validatePanelGeometry,
@@ -569,6 +570,74 @@ test("renderProjectSvg renders pictograms for lid and Standard separators", () =
   assert.match(svg, /class="pictogram-chip"/);
   assert.match(svg, /class="pictogram-text">P<\/text>/);
   assert.match(svg, /class="pictogram-text">S<\/text>/);
+});
+
+test("createProject routes fillers to a secondary fabrication plan", () => {
+  const project = createProject(createDefaultConfig({
+    type: "standard",
+    widthUnits: 3,
+    depthUnits: 4,
+    heightUnits: 2,
+    fabricationPlans: [
+      {
+        id: "fillers-2mm",
+        materialThickness: 2,
+        kerf: 0.08,
+      },
+    ],
+    fillers: [
+      {
+        id: "deck-spacer",
+        width: 40,
+        height: 90,
+        quantity: 2,
+        targetPlan: "fillers-2mm",
+      },
+    ],
+  }));
+
+  assert.equal((project.fabricationPlans ?? []).length, 2);
+
+  const fillerPlan = (project.fabricationPlans ?? []).find((fabricationPlan) => fabricationPlan.id === "fillers-2mm");
+
+  assert.ok(fillerPlan);
+  assert.equal(project.panelGeometries.some((panel) => panel.name.startsWith("filler:")), false);
+  assert.equal(fillerPlan.panelGeometries.length, 1);
+  assert.equal(fillerPlan.panelGeometries[0]?.name, "filler:deck-spacer");
+  assert.equal(fillerPlan.panelGeometries[0]?.quantity, 2);
+  assert.equal(fillerPlan.materialThickness, 2);
+});
+
+test("renderProjectFabricationPlanSvgWithMode renders filler-only layout for a secondary plan", () => {
+  const project = createProject(createDefaultConfig({
+    type: "standard",
+    widthUnits: 3,
+    depthUnits: 4,
+    heightUnits: 2,
+    fabricationPlans: [
+      {
+        id: "fillers-2mm",
+        materialThickness: 2,
+        kerf: 0.08,
+      },
+    ],
+    fillers: [
+      {
+        id: "deck-spacer",
+        width: 40,
+        height: 90,
+        quantity: 2,
+        targetPlan: "fillers-2mm",
+      },
+    ],
+  }));
+
+  const svg = renderProjectFabricationPlanSvgWithMode(project, "fillers-2mm", "layout");
+
+  assert.match(svg, /Plan fillers-2mm/);
+  assert.match(svg, /Material 2 mm/);
+  assert.match(svg, /Filler deck spacer/);
+  assert.match(svg, /class="pictogram-text">F<\/text>/);
 });
 
 test("offsetOrthogonalClosedPath expands and contracts axis-aligned rectangles", () => {

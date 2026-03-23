@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { parseArgs, resolveConfigFromCliArgs } from "./cli.js";
+import { loadConfigFromJson, parseArgs, resolveConfigFromCliArgs } from "./cli.js";
 
 test("resolveConfigFromCliArgs loads a Standard layout from JSON", async () => {
   const temporaryDirectory = await mkdtemp(path.join(tmpdir(), "box50-cli-"));
@@ -67,4 +67,37 @@ test("resolveConfigFromCliArgs rejects layout JSON with Preset", async () => {
     ])),
     /only supported with --type standard/,
   );
+});
+
+test("loadConfigFromJson loads fillers and fabrication plans", async () => {
+  const temporaryDirectory = await mkdtemp(path.join(tmpdir(), "box50-cli-config-"));
+
+  try {
+    const configPath = path.join(temporaryDirectory, "config.json");
+    await writeFile(configPath, JSON.stringify({
+      fillers: [
+        {
+          id: "deck-spacer",
+          width: 40,
+          height: 90,
+          quantity: 2,
+          targetPlan: "fillers-2mm",
+        },
+      ],
+      fabricationPlans: [
+        {
+          id: "fillers-2mm",
+          materialThickness: 2,
+          kerf: 0.08,
+        },
+      ],
+    }), "utf8");
+
+    const loadedConfig = await loadConfigFromJson(configPath);
+
+    assert.equal(loadedConfig.fillers?.[0]?.id, "deck-spacer");
+    assert.equal(loadedConfig.fabricationPlans?.[0]?.id, "fillers-2mm");
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
 });

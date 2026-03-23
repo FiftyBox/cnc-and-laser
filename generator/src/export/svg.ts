@@ -1,6 +1,6 @@
 import { compensatePanelKerf, toSvgPathData, translateClosedPath } from "../core/geometry.js";
 import { formatMillimeters } from "../core/box50.js";
-import type { Box50Project, PanelGeometry } from "../core/types.js";
+import type { Box50FabricationPlan, Box50Project, PanelGeometry } from "../core/types.js";
 
 export type SvgRenderMode = "layout" | "cut";
 
@@ -17,8 +17,8 @@ interface PreviewPanelPlacement extends PositionedPanelGeometry {
 }
 
 interface PreviewPictogram {
-  kind: "lid" | "separator";
-  label?: "P" | "S";
+  kind: "lid" | "separator" | "filler";
+  label?: "P" | "S" | "F";
   orientation?: "horizontal" | "vertical";
 }
 
@@ -37,13 +37,33 @@ export function renderProjectSvg(project: Box50Project): string {
 }
 
 export function renderProjectSvgWithMode(project: Box50Project, mode: SvgRenderMode): string {
-  return mode === "cut"
-    ? renderCutSvg(project)
-    : renderLayoutSvg(project);
+  const primaryPlan = getRenderablePlans(project)[0];
+
+  if (primaryPlan === undefined) {
+    throw new Error("Project must contain at least one fabrication plan.");
+  }
+
+  return renderPlanSvgWithMode(project, primaryPlan, mode);
 }
 
-function renderLayoutSvg(project: Box50Project): string {
-  const positionedPanels = layoutPanelGeometries(project.panelGeometries, PAGE_MARGIN, PAGE_MARGIN + HEADER_HEIGHT)
+export function renderProjectFabricationPlanSvgWithMode(project: Box50Project, planId: string, mode: SvgRenderMode): string {
+  const fabricationPlan = getRenderablePlans(project).find((plan) => plan.id === planId);
+
+  if (fabricationPlan === undefined) {
+    throw new Error(`Unknown fabrication plan ${planId}.`);
+  }
+
+  return renderPlanSvgWithMode(project, fabricationPlan, mode);
+}
+
+function renderPlanSvgWithMode(project: Box50Project, fabricationPlan: Box50FabricationPlan, mode: SvgRenderMode): string {
+  return mode === "cut"
+    ? renderCutSvg(project, fabricationPlan)
+    : renderLayoutSvg(project, fabricationPlan);
+}
+
+function renderLayoutSvg(project: Box50Project, fabricationPlan: Box50FabricationPlan): string {
+  const positionedPanels = layoutPanelGeometries(fabricationPlan.panelGeometries, PAGE_MARGIN, PAGE_MARGIN + HEADER_HEIGHT)
     .map((panel, index) => ({
       ...panel,
       previewNumber: index + 1,
@@ -59,7 +79,7 @@ function renderLayoutSvg(project: Box50Project): string {
   const height = Math.max(layoutBounds.maxY + PAGE_MARGIN, assemblyPlan.bottom + PAGE_MARGIN);
 
   const panelMarkup = positionedPanels.map((panel) => renderPreviewPanel(panel)).join("\n");
-  const summaryMarkup = renderSummary(project, sheetWidth, sheetHeight);
+  const summaryMarkup = renderSummary(project, fabricationPlan, sheetWidth, sheetHeight);
   const envelopeMarkup = renderSheetEnvelope(sheetWidth, sheetHeight);
   const legendMarkup = renderLegend(positionedPanels, legendX);
 
@@ -99,10 +119,10 @@ function renderLayoutSvg(project: Box50Project): string {
   ].join("\n");
 }
 
-function renderCutSvg(project: Box50Project): string {
-  const positionedPanels = layoutPanelGeometries(project.panelGeometries);
+function renderCutSvg(project: Box50Project, fabricationPlan: Box50FabricationPlan): string {
+  const positionedPanels = layoutPanelGeometries(fabricationPlan.panelGeometries);
   const translatedPaths = positionedPanels.flatMap((panel) => {
-    const compensatedPanel = compensatePanelKerf(panel, project.config.kerf);
+    const compensatedPanel = compensatePanelKerf(panel, fabricationPlan.kerf);
 
     return compensatedPanel.cutPaths.map((path) => translateClosedPath(path, { x: panel.x, y: panel.y }));
   });
@@ -126,14 +146,17 @@ function renderCutSvg(project: Box50Project): string {
   ].join("\n");
 }
 
-function renderSummary(project: Box50Project, sheetWidth: number, sheetHeight: number): string {
+function renderSummary(project: Box50Project, fabricationPlan: Box50FabricationPlan, sheetWidth: number, sheetHeight: number): string {
   const { config, dimensions } = project;
-  const projectName = formatProjectName(project);
+  const projectName = formatProjectName(project, fabricationPlan);
+  const planLabel = fabricationPlan.id === "main"
+    ? ""
+    : ` • Plan ${fabricationPlan.id}`;
 
   return [
     renderBox50Logo(PAGE_MARGIN, PAGE_MARGIN - 2),
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 5}" class="subtitle">${escapeXml(projectName)}</text>`,
-    `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 12}" class="meta">Profile ${config.type} • Material ${formatMillimeters(config.materialThickness)} • Kerf ${formatMillimeters(config.kerf)}</text>`,
+    `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 12}" class="meta">Profile ${config.type}${planLabel} • Material ${formatMillimeters(fabricationPlan.materialThickness)} • Kerf ${formatMillimeters(fabricationPlan.kerf)}</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 18}" class="meta">External ${dimensions.externalWidth} × ${dimensions.externalDepth} × ${dimensions.externalHeight} mm</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 24}" class="meta">Internal ${dimensions.internalWidth.toFixed(2)} × ${dimensions.internalDepth.toFixed(2)} × ${dimensions.internalHeight.toFixed(2)} mm</text>`,
     `<text x="${HEADER_CONTENT_X}" y="${PAGE_MARGIN + 30}" class="meta">Required sheet envelope ${sheetWidth.toFixed(2)} × ${sheetHeight.toFixed(2)} mm</text>`,
@@ -245,6 +268,14 @@ function renderPreviewPictogram(panel: PreviewPanelPlacement, translatedOuterPat
 function resolvePreviewPictogram(panel: PreviewPanelPlacement): PreviewPictogram | undefined {
   if (panel.name === "lid") {
     return { kind: "lid" };
+  }
+
+  if (panel.name.startsWith("filler:")) {
+    return {
+      kind: "filler",
+      label: "F",
+      orientation: panel.width >= panel.height ? "horizontal" : "vertical",
+    };
   }
 
   if (!panel.name.startsWith("separator:")) {
@@ -717,6 +748,11 @@ function formatLegendPanelName(name: string): string {
     return "Sliding lid";
   }
 
+  if (name.startsWith("filler:")) {
+    const fillerId = name.slice("filler:".length).replaceAll("-", " ");
+    return `Filler ${fillerId}`;
+  }
+
   if (name.startsWith("separator:")) {
     const separatorId = name.slice("separator:".length).replaceAll("-", " ");
     return `Separator ${separatorId}`;
@@ -788,16 +824,36 @@ function formatDisplayNumber(value: number): string {
   return Number(value.toFixed(2)).toString();
 }
 
-function formatProjectName(project: Box50Project): string {
+function formatProjectName(project: Box50Project, fabricationPlan: Box50FabricationPlan): string {
   const layoutId = project.config.standardLayout?.id;
+  const baseName = layoutId !== undefined
+    ? humanizeIdentifier(layoutId)
+    : project.config.type === "standard"
+      ? "Standard Layout"
+      : "Finalized Preset";
 
-  if (layoutId !== undefined) {
-    return humanizeIdentifier(layoutId);
+  if (fabricationPlan.id === "main") {
+    return baseName;
   }
 
-  return project.config.type === "standard"
-    ? "Standard Layout"
-    : "Finalized Preset";
+  return `${baseName} ${humanizeIdentifier(fabricationPlan.id)}`;
+}
+
+function getRenderablePlans(project: Box50Project): Box50FabricationPlan[] {
+  const fabricationPlans = project.fabricationPlans ?? [];
+
+  if (fabricationPlans.length > 0) {
+    return fabricationPlans;
+  }
+
+  return [{
+    id: "main",
+    materialThickness: project.config.materialThickness,
+    kerf: project.config.kerf,
+    panels: project.panels,
+    panelGeometries: project.panelGeometries,
+    fileStem: project.fileStem,
+  }];
 }
 
 function humanizeIdentifier(value: string): string {

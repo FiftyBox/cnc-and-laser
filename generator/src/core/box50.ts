@@ -1,5 +1,5 @@
 import { createOffsetRectanglePath, createPanelGeometry, createStandardBottomPanelGeometry, createStandardDividerPanelGeometry, createStandardRailProfilePath, createStandardWallPanelGeometry } from "./geometry.js";
-import type { Box50Config, Box50Dimensions, Box50Project, ClosedPath, PanelDefinition, PanelGeometry, StandardLayoutDefinition, StandardSeparatorDefinition } from "./types.js";
+import type { Box50Config, Box50Dimensions, Box50FabricationPlan, Box50Project, ClosedPath, FabricationPlanDefinition, FillerDefinition, PanelDefinition, PanelGeometry, StandardLayoutDefinition, StandardSeparatorDefinition } from "./types.js";
 import { validateProjectGeometry } from "./validation.js";
 
 const BOX_GRID_MM = 50;
@@ -70,6 +70,56 @@ export function validateConfig(config: Box50Config): void {
   for (const [name, value] of metricFields) {
     if (!Number.isFinite(value) || value <= 0) {
       throw new Error(`${name} must be a positive number.`);
+    }
+  }
+
+  const additionalFabricationPlanIds = new Set<string>();
+
+  for (const fabricationPlan of config.fabricationPlans ?? []) {
+    if (fabricationPlan.id === "main") {
+      throw new Error("fabricationPlans cannot redefine the reserved main plan id.");
+    }
+
+    if (additionalFabricationPlanIds.has(fabricationPlan.id)) {
+      throw new Error(`fabrication plan id ${fabricationPlan.id} must be unique.`);
+    }
+
+    additionalFabricationPlanIds.add(fabricationPlan.id);
+
+    if (!Number.isFinite(fabricationPlan.materialThickness) || fabricationPlan.materialThickness <= 0) {
+      throw new Error(`fabrication plan ${fabricationPlan.id} materialThickness must be a positive number.`);
+    }
+
+    if (!Number.isFinite(fabricationPlan.kerf) || fabricationPlan.kerf <= 0) {
+      throw new Error(`fabrication plan ${fabricationPlan.id} kerf must be a positive number.`);
+    }
+  }
+
+  const fillerIds = new Set<string>();
+
+  for (const filler of config.fillers ?? []) {
+    if (fillerIds.has(filler.id)) {
+      throw new Error(`filler id ${filler.id} must be unique.`);
+    }
+
+    fillerIds.add(filler.id);
+
+    if (!Number.isFinite(filler.width) || filler.width <= 0) {
+      throw new Error(`filler ${filler.id} width must be a positive number.`);
+    }
+
+    if (!Number.isFinite(filler.height) || filler.height <= 0) {
+      throw new Error(`filler ${filler.id} height must be a positive number.`);
+    }
+
+    if (!Number.isInteger(filler.quantity) || filler.quantity <= 0) {
+      throw new Error(`filler ${filler.id} quantity must be a positive integer.`);
+    }
+
+    const targetPlan = filler.targetPlan ?? "main";
+
+    if (targetPlan !== "main" && !additionalFabricationPlanIds.has(targetPlan)) {
+      throw new Error(`filler ${filler.id} references unknown fabrication plan ${targetPlan}.`);
     }
   }
 }
@@ -271,17 +321,33 @@ export function createProject(config: Box50Config): Box50Project {
   const resolvedLayout = config.type === "standard" && config.standardLayout !== undefined
     ? resolveStandardLayout(config.standardLayout, dimensions, config)
     : undefined;
-  const panels = buildPanelsWithLayout(dimensions, config, resolvedLayout);
-  const panelGeometries = config.type === "standard"
-    ? buildStandardPanelGeometries(dimensions, config, panels, resolvedLayout)
-    : buildPanelGeometries(panels);
+  const structuralPanels = buildPanelsWithLayout(dimensions, config, resolvedLayout);
+  const structuralPanelGeometries = config.type === "standard"
+    ? buildStandardPanelGeometries(dimensions, config, structuralPanels, resolvedLayout)
+    : buildPanelGeometries(structuralPanels);
+  const projectFileStem = buildFileStem(dimensions, config.type);
+  const fillersByPlan = groupFillersByTargetPlan(config.fillers ?? []);
+  const mainFillerPanels = buildFillerPanels(fillersByPlan.get("main") ?? []);
+  const additionalFabricationPlans = buildAdditionalFabricationPlans(projectFileStem, config.fabricationPlans ?? [], fillersByPlan);
+  const hasMultiplePlans = additionalFabricationPlans.length > 0;
+  const mainFabricationPlan: Box50FabricationPlan = {
+    id: "main",
+    materialThickness: config.materialThickness,
+    kerf: config.kerf,
+    note: "Primary structural plan",
+    panels: [...structuralPanels, ...mainFillerPanels],
+    panelGeometries: [...structuralPanelGeometries, ...mainFillerPanels.map((panel) => createPanelGeometry(panel))],
+    fileStem: hasMultiplePlans ? `${projectFileStem}-main` : projectFileStem,
+  };
+  const fabricationPlans = [mainFabricationPlan, ...additionalFabricationPlans];
 
   const project: Box50Project = {
     config,
     dimensions,
-    panels,
-    panelGeometries,
-    fileStem: buildFileStem(dimensions, config.type),
+    panels: mainFabricationPlan.panels,
+    panelGeometries: mainFabricationPlan.panelGeometries,
+    fileStem: projectFileStem,
+    fabricationPlans,
   };
 
   validateProjectGeometry(project);
@@ -589,6 +655,57 @@ function buildStandardSeparatorNote(separator: StandardSeparatorDefinition): str
   const roleLabel = separator.role === "primary" ? "Primary" : "Secondary";
   const orientationLabel = separator.orientation === "vertical" ? "vertical" : "horizontal";
   return `Standard ${roleLabel.toLowerCase()} separator, ${orientationLabel} span ${formatMillimeters(separator.spanEnd - separator.spanStart)}`;
+}
+
+function groupFillersByTargetPlan(fillers: FillerDefinition[]): Map<string, FillerDefinition[]> {
+  const fillersByTargetPlan = new Map<string, FillerDefinition[]>();
+
+  for (const filler of fillers) {
+    const targetPlan = filler.targetPlan ?? "main";
+    const targetFillers = fillersByTargetPlan.get(targetPlan) ?? [];
+    targetFillers.push(filler);
+    fillersByTargetPlan.set(targetPlan, targetFillers);
+  }
+
+  return fillersByTargetPlan;
+}
+
+function buildFillerPanels(fillers: FillerDefinition[]): PanelDefinition[] {
+  return fillers.map((filler) => ({
+    name: `filler:${filler.id}`,
+    width: filler.width,
+    height: filler.height,
+    quantity: filler.quantity,
+    note: filler.note ?? `Filler plate ${formatMillimeters(filler.width)} x ${formatMillimeters(filler.height)}`,
+  }));
+}
+
+function buildAdditionalFabricationPlans(
+  projectFileStem: string,
+  fabricationPlanDefinitions: FabricationPlanDefinition[],
+  fillersByPlan: Map<string, FillerDefinition[]>,
+): Box50FabricationPlan[] {
+  const fabricationPlans: Box50FabricationPlan[] = [];
+
+  for (const fabricationPlanDefinition of fabricationPlanDefinitions) {
+    const fillerPanels = buildFillerPanels(fillersByPlan.get(fabricationPlanDefinition.id) ?? []);
+
+    if (fillerPanels.length === 0) {
+      continue;
+    }
+
+    fabricationPlans.push({
+      id: fabricationPlanDefinition.id,
+      materialThickness: fabricationPlanDefinition.materialThickness,
+      kerf: fabricationPlanDefinition.kerf,
+      ...(fabricationPlanDefinition.note === undefined ? {} : { note: fabricationPlanDefinition.note }),
+      panels: fillerPanels,
+      panelGeometries: fillerPanels.map((panel) => createPanelGeometry(panel)),
+      fileStem: `${projectFileStem}-${fabricationPlanDefinition.id}`,
+    });
+  }
+
+  return fabricationPlans;
 }
 
 function approxEqual(left: number, right: number, tolerance = 0.05): boolean {

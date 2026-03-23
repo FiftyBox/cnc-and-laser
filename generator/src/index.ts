@@ -3,9 +3,12 @@ export { compensatePanelKerf, createPanelGeometry, createRectanglePath, createSt
 export type {
 	Box50Config,
 	Box50Dimensions,
+	Box50FabricationPlan,
 	Box50Project,
 	BoxProfile,
 	ClosedPath,
+	FabricationPlanDefinition,
+	FillerDefinition,
 	PanelDefinition,
 	PanelGeometry,
 	Point,
@@ -18,5 +21,5 @@ export type {
 } from "./core/types.js";
 export { validatePanelGeometry, validateProjectGeometry } from "./core/validation.js";
 export type { GeometryValidationIssue } from "./core/validation.js";
-export { renderProjectSvg, renderProjectSvgWithMode } from "./export/svg.js";
+export { renderProjectFabricationPlanSvgWithMode, renderProjectSvg, renderProjectSvgWithMode } from "./export/svg.js";
 export type { SvgRenderMode } from "./export/svg.js";
